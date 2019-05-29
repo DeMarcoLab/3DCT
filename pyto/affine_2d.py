@@ -14,15 +14,15 @@ import numpy
 import scipy
 import scipy.linalg as linalg
 
-from points import Points
-from affine import Affine
+from .points import Points
+from .affine import Affine
 
 class Affine2D(Affine):
     """
     Finds and preforms affine transformation (general linear transformation
     followed by translation) on points (vectors) in 2D.
 
-    The transformation that transforms points x to points y has the following 
+    The transformation that transforms points x to points y has the following
     form:
 
       y = gl x + d
@@ -54,22 +54,22 @@ class Affine2D(Affine):
       - rmsError: root mean square error of the transformation
     """
 
-    def __init__(self, d=None, gl=None, phi=None, scale=None, 
+    def __init__(self, d=None, gl=None, phi=None, scale=None,
                  parity=1, shear=0, order='qpsm', xy_axes='point_dim'):
         """
         Initialization. Following argument combinations are valid:
           - no arguments: no transformation matrices are initialized
           - d and gl: d and gl are set
-          - d, phi and scale (parity and shear optional): d and gl 
+          - d, phi and scale (parity and shear optional): d and gl
           (gl = q p s m) are set
 
-        If arg d is None it is set to [0, 0]. If it is a single number it is 
+        If arg d is None it is set to [0, 0]. If it is a single number it is
         set to the same value in both directions.
-          
-        If the arg xy_axes is 'point_dim' / 'dim_point', points used in this 
-        instance should be specified as n_point x 2 / 2 x n_point 
+
+        If the arg xy_axes is 'point_dim' / 'dim_point', points used in this
+        instance should be specified as n_point x 2 / 2 x n_point
         matrices.
-        
+
          Arguments
           - gl: gl matrix
           - phi: angle
@@ -93,7 +93,7 @@ class Affine2D(Affine):
                 gl, d, order=order, xy_axes=xy_axes)
 
         elif (phi is not None) and (scale is not None) and (d is not None):
-            
+
             if not isinstance(scale, (numpy.ndarray, list)):
                 scale = self.makeS(scale)
             elif isinstance(scale, numpy.adarray) and (len(scale.shape) == 1):
@@ -117,7 +117,7 @@ class Affine2D(Affine):
         """
         Returns instance of this class that was obtained by dowoncasting
         art affine (instance of Affine, base class of this class).
-        
+
         Argument:
           - affine: instance of Affine
         """
@@ -126,14 +126,14 @@ class Affine2D(Affine):
         new = cls(gl=affine.gl, d=affine.d, xy_axes=affine.xy_axes)
 
         # copy attributes that are not obligarory
-        for name in ['order', 'resids', 'rank', 'singular', 'error', '_xPrime', 
+        for name in ['order', 'resids', 'rank', 'singular', 'error', '_xPrime',
                      '_yPrime', 'q', 'p', 's', 'm', 'xy_axes']:
             try:
                 value = getattr(affine, name)
                 setattr(new, name, value)
             except AttributeError:
                 pass
-                
+
         return new
 
     ##############################################################
@@ -144,13 +144,13 @@ class Affine2D(Affine):
     @classmethod
     def identity(cls, ndim=2):
         """
-        Returnes an identity object of this class, that is a transformation 
+        Returnes an identity object of this class, that is a transformation
         that leaves all vectors invariant.
 
         Argument ndim is ignored, it should be 2 here.
         """
 
-        obj = cls.__base__.identity(ndim=2)        
+        obj = cls.__base__.identity(ndim=2)
         return obj
 
     @classmethod
@@ -167,7 +167,7 @@ class Affine2D(Affine):
         """
         Returns angle corresponding to the rotation matrix specified by arg q
         """
-        
+
         res = numpy.arctan2(q[1,0], q[0,0])
         return res
 
@@ -177,7 +177,7 @@ class Affine2D(Affine):
         Returns scale transformation corresponding to 1D array scale.
 
         Argument:
-          - scale: can be given as an 1d array (or a list), or as a single 
+          - scale: can be given as an 1d array (or a list), or as a single
           number in which case the scale is the same in all directions
         """
 
@@ -187,9 +187,9 @@ class Affine2D(Affine):
     @classmethod
     def makeP(cls, parity, axis=-1):
         """
-        Returns parity matrix corresponding to arg parity. 
+        Returns parity matrix corresponding to arg parity.
 
-        If parity is -1, the element of the parity matrix corresponding to 
+        If parity is -1, the element of the parity matrix corresponding to
         axis is set to -1 (all other are 1).
 
         Arguments:
@@ -205,14 +205,14 @@ class Affine2D(Affine):
         """
         Returns share matrix corresponding to (arg) shear.
         """
-        m = numpy.array([[1, shear], 
+        m = numpy.array([[1, shear],
                          [0, 1]])
         return m
 
     @classmethod
     def makeD(cls, d):
         """
-        Returns d (translation) array corresponding to arg parity. 
+        Returns d (translation) array corresponding to arg parity.
 
         Arguments:
           - d: (single number) translation
@@ -265,7 +265,7 @@ class Affine2D(Affine):
             self.gl = self.composeGl()
         except AttributeError:
             pass
-    phiDeg = property(fget=getPhiDeg, fset=setPhiDeg, 
+    phiDeg = property(fget=getPhiDeg, fset=setPhiDeg,
                       doc='Rotation angle in degrees')
 
     def getUAngle(self):
@@ -281,7 +281,7 @@ class Affine2D(Affine):
         self.u = self.makeQ(angle)
         self.gl = self.composeGl()
 
-    uAngle = property(fget=getUAngle, fset=setUAngle, 
+    uAngle = property(fget=getUAngle, fset=setUAngle,
                    doc='Rotation angle corresponding to matrix U in radians')
 
     def getUAngleDeg(self):
@@ -299,7 +299,7 @@ class Affine2D(Affine):
         self.u = self.makeQ(angle_rad)
         self.gl = self.composeGl()
 
-    uAngleDeg = property(fget=getUAngleDeg, fset=setUAngleDeg, 
+    uAngleDeg = property(fget=getUAngleDeg, fset=setUAngleDeg,
                    doc='Rotation angle corresponding to matrix U in degrees')
 
     def getVAngle(self):
@@ -315,7 +315,7 @@ class Affine2D(Affine):
         self.v = self.makeQ(angle)
         self.gl = self.composeGl()
 
-    vAngle = property(fget=getVAngle, fset=setVAngle, 
+    vAngle = property(fget=getVAngle, fset=setVAngle,
                    doc='Rotation angle corresponding to matrix V in radians')
 
     def getVAngleDeg(self):
@@ -333,12 +333,12 @@ class Affine2D(Affine):
         self.v = self.makeQ(angle_rad)
         self.gl = self.composeGl()
 
-    vAngleDeg = property(fget=getVAngleDeg, fset=setVAngleDeg, 
+    vAngleDeg = property(fget=getVAngleDeg, fset=setVAngleDeg,
                    doc='Rotation angle corresponding to matrix V in degrees')
 
     def getScaleAngle(self):
         """
-        Returns angle (in rad) that corresponds to the scaling: 
+        Returns angle (in rad) that corresponds to the scaling:
 
           arccos(scale_smaller / scale_larger)
 
@@ -346,7 +346,7 @@ class Affine2D(Affine):
         factors, respectively.
 
         Rotation of an 2D object by this angle around x-axis in 3D is eqivalent
-        to scaling this object by self.scale (up to a common scale factor).  
+        to scaling this object by self.scale (up to a common scale factor).
         """
         ratio = self.scale[1] / self.scale[0]
         if ratio > 1:
@@ -355,22 +355,22 @@ class Affine2D(Affine):
         return res
 
     scaleAngle = property(
-        fget=getScaleAngle, 
+        fget=getScaleAngle,
         doc='Angle corresponding to the ratio of scales (in rad)')
 
     def getScaleAngleDeg(self):
         """
-        Returns angle in degrees that corresponds to the scaling: 
+        Returns angle in degrees that corresponds to the scaling:
 
           arccos(scale[1]/scale[0])
 
         Rotation of an 2D object by this angle around x-axis in 3D is eqivalent
-        to scaling this object by self.scale (up to a common scale factor).  
+        to scaling this object by self.scale (up to a common scale factor).
         """
         return self.scaleAngle * 180 / numpy.pi
 
     scaleAngleDeg = property(
-        fget=getScaleAngleDeg, 
+        fget=getScaleAngleDeg,
         doc='Angle corresponding to the ratio of scales in degrees')
 
     def getShear(self):
@@ -396,16 +396,16 @@ class Affine2D(Affine):
             cls, x, y, x_ref='cm', y_ref='cm', type_='gl', xy_axes='point_dim'):
         """
         Finds affine transformation (general linear transformation folowed by a
-        translation) that minimizes square error for transforming points x to 
+        translation) that minimizes square error for transforming points x to
         points y in 2D. The transformation has the form
 
           y = gl x + d,                                            (1)
 
         and:
- 
+
           gl = q s p m   for type_='gl'
           gl = S q p     for type_='rs'
- 
+
         where d is translation vector, q, s, p and m are rotation, scaling,
         parity and shear matrices, respectivly and S is a scalar scale (same
         for both directions)
@@ -437,17 +437,17 @@ class Affine2D(Affine):
           - x_ref, y_ref: (ndarray) coordinates of reference points, or 'cm' to
           use center of mass
 
-        Returns the transformation found as an instance of class cls, with 
+        Returns the transformation found as an instance of class cls, with
         following attributes:
           - gl: general linear transformation matrix
           - d: translation vector
-          - q, p, s, m: rotation, parity, scale and shear matrices 
+          - q, p, s, m: rotation, parity, scale and shear matrices
           - error: difference between y and transformed x values
           - resids, rank, singular: values returned from scipy.linalg.lstsq
           - _xPrime: x - x_ref
           - _yPrime: y - y_ref
           - type_: type of the optimization, 'gl' to find Gl transformation
-          that optimizes the square error, or 'rs' to find the best rotation 
+          that optimizes the square error, or 'rs' to find the best rotation
           and one scale (currently implemented for 2D transformations only)
         """
 
@@ -478,9 +478,9 @@ class Affine2D(Affine):
         x to points y. The transformation has the form
 
           y = gl x + d,    gl = S q p                                     (1)
- 
-        where d is translation vector, q and p are rotation and parity 
-        matrices, respectivly and S is a scalar scale (same for both 
+
+        where d is translation vector, q and p are rotation and parity
+        matrices, respectivly and S is a scalar scale (same for both
         directions)
 
         In the default mode (x_ref='cm' and y_ref='cm') the parameters are
@@ -499,9 +499,9 @@ class Affine2D(Affine):
         Note that in this case the parameters found do not minimize the error
         of eq 1.
 
-        In center of mass coordinates, scale and parity are calculated 
+        In center of mass coordinates, scale and parity are calculated
         directly using:
-        
+
           S = sqrt( det(yx) / det(xx) )
 
           P = sign( det(yx) / det(xx) )
@@ -511,7 +511,7 @@ class Affine2D(Affine):
           tan(phi + pi/2) = tr(y p x) / tr(y r0 p x)
 
         where:
-          
+
           r0 = 0 -1
                1  0
 
@@ -520,18 +520,18 @@ class Affine2D(Affine):
           - x_ref, y_ref: (ndarray) coordinates of reference points, or 'cm' to
           use center of mass
 
-        Returns the transformation found as an instance of class cls, with 
+        Returns the transformation found as an instance of class cls, with
         following attributes:
           - gl: general linear transformation matrix
           - d: translation vector
-          - q, p, s, m: rotation, parity, scale and shear matrices 
+          - q, p, s, m: rotation, parity, scale and shear matrices
           - error: difference between y and transformed x values
           - resids, rank, singular: values returned from scipy.linalg.lstsq
 
         Note: To be replaced by SVD based method
         """
 
-        # bring x and y to n_points x n_dim shape 
+        # bring x and y to n_points x n_dim shape
         if xy_axes == 'point_dim':
             pass
         elif xy_axes == 'dim_point':
@@ -550,7 +550,7 @@ class Affine2D(Affine):
         else:
             raise ValueError(\
                 'Argument x_ref: ', x_ref, ' was not understood.',
-                " Allowed values are None, 'cm', or an array.") 
+                " Allowed values are None, 'cm', or an array.")
         x_prime = x - x_ref
 
         # bring y to reference frame
@@ -561,7 +561,7 @@ class Affine2D(Affine):
         else:
             raise ValueError(\
                 'Argument y_ref: ', y_ref, ' was not understood.',
-                " Allowed values are None, 'cm', or an array.") 
+                " Allowed values are None, 'cm', or an array.")
         y_prime = y - y_ref
 
         # find parity and scale
@@ -588,7 +588,7 @@ class Affine2D(Affine):
         if yqpx < 0:
             phi += numpy.pi
             q = cls.getQ(phi)
- 
+
         # get gl and d and instantiate
         gl = numpy.dot(numpy.dot(q, s), p)
         d = y_ref - numpy.inner(x_ref, gl)
@@ -599,20 +599,20 @@ class Affine2D(Affine):
         inst.error = y - inst.transform(x, xy_axes='point_dim')
         if xy_axes == 'dim_point':
             inst.error = inst.error.transpose()
- 
+
         # save transformations
         inst.q = q
         inst.s = s
         inst.p = p
         inst.m = numpy.identity(2)
         #inst.gl = gl
-   
+
         return inst
 
     def findConformal(cls, x, y, x_mask=None, y_mask=None, d=None):
         """
         Work in progress
-        
+
         Finds conformal transformation (global scaling and rotation folowed by a
         translation) that transforms points x to points y:
 
@@ -627,8 +627,8 @@ class Affine2D(Affine):
           d = y_cm - gl x_cm
 
         where x_cm and y_cm are x and y centers of mass.
-    
-        If d (translation) is given the transformation is determined using 
+
+        If d (translation) is given the transformation is determined using
         given d.
 
         Only the points that are not masked neither in x_mask nor in y_mask are
@@ -636,11 +636,11 @@ class Affine2D(Affine):
 
         Arguments:
           - x, y: sets of points, both having shape (n_points, n_dim)
-          - x_mask, y_masks: masked (not used) points, vectors of length 
+          - x_mask, y_masks: masked (not used) points, vectors of length
           n_points
           - d: translation vector of length ndim
 
-        Returns an instance of the transformation found with following 
+        Returns an instance of the transformation found with following
         attributes:
           - gl: transformation matrix
           - d: translation vector
@@ -676,13 +676,13 @@ class Affine2D(Affine):
         """
         Decomposes gl using QR or singular value decomposition as follows:
 
-          gl = q p s m (order 'qr' or 'qpsm') 
+          gl = q p s m (order 'qr' or 'qpsm')
           gl = p s m q (order 'rq' or 'psmq')
           gl = u p s v (order 'usv')
 
         where:
           - q, u, v: rotation matrix (orthogonal, with det +1)
-          - p: parity matrix (diagonal, the element self.parity_axis can be +1 
+          - p: parity matrix (diagonal, the element self.parity_axis can be +1
           or -1, other diagonal elements +1)
           - s: scale martix, diagonal and >=0
           - m: shear matrix, upper triangular, all diagonal elements 1
@@ -694,17 +694,17 @@ class Affine2D(Affine):
         corresponding to rotation matrix U is set to be between -pi/2 and pi/2.
         This is achieved by rotation of both U and V matrices by pi (if needed).
 
-        Note: uses decompose() from super for everything except the adjustment 
+        Note: uses decompose() from super for everything except the adjustment
         of U (and V).
 
         Arguments:
           - gl: (ndarray) general linear transformation, or self.gl if None
-          - order: decomposition order 'qpsm' (same as 'qr'), 'psmq' (same as 
+          - order: decomposition order 'qpsm' (same as 'qr'), 'psmq' (same as
           'rq'), or 'usv'
 
-        If arg gl is None, self.gl us used and the matrices resulting from the 
+        If arg gl is None, self.gl us used and the matrices resulting from the
         decomposition are saved as the arguments of this instance:
-          - self.q, self.p, self.s and self.m if order 'qpsm', 'qr', 'psmq' 
+          - self.q, self.p, self.s and self.m if order 'qpsm', 'qr', 'psmq'
           or 'rq'
           - self.u, self.p, self.s, self.v if order 'usv'
 
@@ -713,7 +713,7 @@ class Affine2D(Affine):
           - (u, p, s, v) if order 'usv'
         """
 
-        # figure out type of return 
+        # figure out type of return
         if gl is None:
             new = False
         else:
@@ -751,7 +751,7 @@ class Affine2D(Affine):
         If the angle corresponding to the rotation matrix U is already between
         -pi/2 and pi/2, doesn't do anything.
         """
-        
+
         if (self.uAngle > numpy.pi / 2) or (self.uAngle < -numpy.pi / 2):
 
             # adjust u

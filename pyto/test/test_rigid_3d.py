@@ -175,7 +175,7 @@ class TestRigid3D(np_test.TestCase):
         # cm=True improves but doesn't find optimal
         # fine if optimizing scale
         res = Rigid3D.find_32_constr_ck(
-            x=x_cs, y=x_cs[:2,:], scale=1, cm=False, use_jac=False, 
+            x=x_cs, y=x_cs[:2,:], scale=1, cm=False, use_jac=False,
             init=[0.2, -0.4, 0.5, -0.1])
         #np_test.assert_almost_equal(res.y, x_cs, decimal=3)
         #np_test.assert_almost_equal(res.gl, np.identity(3), decimal=3)
@@ -183,7 +183,7 @@ class TestRigid3D(np_test.TestCase):
         # cm=True improves but doesn't find optimal
         # fine if optimizing scale
         res = Rigid3D.find_32_constr_ck(
-            x=x_cs, y=x_cs[:2,:], scale=1, cm=False, use_jac=True, 
+            x=x_cs, y=x_cs[:2,:], scale=1, cm=False, use_jac=True,
             init=[0.2, -0.4, 0.5, np.sqrt(0.55)])
         y = np.array([[0., 0, -2, 0],
                       [0, 1, 0, 0],
@@ -191,17 +191,17 @@ class TestRigid3D(np_test.TestCase):
         # fine when +np.sqrt(0.55)
         # cm=True improves but doesn't find optimal
         res = Rigid3D.find_32_constr_ck(
-            x=x_cs, y=y[:2,:], scale=1, cm=False, use_jac=False, 
+            x=x_cs, y=y[:2,:], scale=1, cm=False, use_jac=False,
             init=[0.2, -0.4, 0.5, -np.sqrt(0.55)])
 
         # fails for 4, 5, 6 * pi/5, ok for 3 and 7
         # small init changes don't help
-        # reducing z helps, the closer theta to pi the larger reduction  
+        # reducing z helps, the closer theta to pi the larger reduction
         # cm=True improves but doesn't find optimal
         # fine if optimizing scale
         r = Rigid3D.make_r_euler([np.pi/2, 6 * np.pi/5, -np.pi/2])
         res = Rigid3D.find_32_constr_ck(
-            x=x_cs, y=np.dot(r, x_cs)[:2,:], scale=1, cm=False, use_jac=True) 
+            x=x_cs, y=np.dot(r, x_cs)[:2,:], scale=1, cm=False, use_jac=True)
 
         # pi around z (fi)
         # fails after 1 iter when init=[1, 0, 0, 0] and cm=False
@@ -236,7 +236,7 @@ class TestRigid3D(np_test.TestCase):
         np_test.assert_almost_equal(res.y[2,:], np.dot(r, x_cm)[2,:], decimal=3)
         np_test.assert_almost_equal(res.gl, r, decimal=3)
         np_test.assert_almost_equal(
-            Rigid3D.extract_euler(res.gl, mode='x'), 
+            Rigid3D.extract_euler(res.gl, mode='x'),
             angles, decimal=3)
 
         # low z example 2
@@ -252,11 +252,11 @@ class TestRigid3D(np_test.TestCase):
         np_test.assert_almost_equal(res.y[2,:], np.dot(r, x_cm)[2,:], decimal=3)
         np_test.assert_almost_equal(res.gl, r, decimal=3)
         np_test.assert_almost_equal(
-            Rigid3D.extract_euler(res.gl, mode='x'), 
+            Rigid3D.extract_euler(res.gl, mode='x'),
             angles, decimal=3)
 
         # low z example 3
-        # Note: fails with default init when fi and psi interchanged, added to 
+        # Note: fails with default init when fi and psi interchanged, added to
         # test_find_32_constr_ck_multi()
         x = np.array([[3.2, 7.8, 0.3, 4, 5],
                       [1.3, 3.6, 5.4, 6, 3.8],
@@ -270,7 +270,7 @@ class TestRigid3D(np_test.TestCase):
         np_test.assert_almost_equal(res.y[2,:], np.dot(r, x_cm)[2,:], decimal=3)
         np_test.assert_almost_equal(res.gl, r, decimal=3)
         np_test.assert_almost_equal(
-            Rigid3D.extract_euler(res.gl, mode='x'), 
+            Rigid3D.extract_euler(res.gl, mode='x'),
             angles, decimal=3)
 
         # low z example w noise
@@ -289,7 +289,7 @@ class TestRigid3D(np_test.TestCase):
         #np_test.assert_almost_equal(res.y[2,:], np.dot(r, x_cm)[2,:], decimal=2)
         #np_test.assert_almost_equal(res.gl, r, decimal=1)
         #np_test.assert_almost_equal(
-        #    Rigid3D.extract_euler(res.gl, mode='x'), 
+        #    Rigid3D.extract_euler(res.gl, mode='x'),
         #    angles, decimal=1)
 
     def test_find_32_constr_ck_scale_fixed(self):
@@ -327,7 +327,7 @@ class TestRigid3D(np_test.TestCase):
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
 
         # low z example
-        # Note: fails with default init when fi and psi interchanged, added to 
+        # Note: fails with default init when fi and psi interchanged, added to
         # test_find_32_constr_ck_multi()
         x = np.array([[3.2, 7.8, 0.3, 4, 5],
                       [1.3, 3.6, 5.4, 6, 3.8],
@@ -337,7 +337,7 @@ class TestRigid3D(np_test.TestCase):
         x_cm = x - x.mean(axis=-1).reshape((3,1))
         r = Rigid3D.make_r_euler(angles, mode='x')
         res = Rigid3D.find_32_constr_ck(
-            x=x_cm, y=scale*np.dot(r, x_cm)[:2,:], scale=4.8, cm=False, 
+            x=x_cm, y=scale*np.dot(r, x_cm)[:2,:], scale=4.8, cm=False,
             use_jac=True)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
         np_test.assert_almost_equal(
@@ -345,12 +345,12 @@ class TestRigid3D(np_test.TestCase):
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.s_scalar, scale)
         np_test.assert_almost_equal(
-            Rigid3D.extract_euler(res.q, mode='x'), 
+            Rigid3D.extract_euler(res.q, mode='x'),
             angles, decimal=3)
 
     def test_find_32_constr_ck(self):
         """
-        Tests find_32_constr_ck(scale=None) 
+        Tests find_32_constr_ck(scale=None)
         """
 
         # coord system-like points
@@ -393,7 +393,7 @@ class TestRigid3D(np_test.TestCase):
         # identity, non-optimal initial
         # doesn't find optimal without scale optimization
         res = Rigid3D.find_32_constr_ck(
-            x=x_cs, y=x_cs[:2,:], scale=None, cm=False, use_jac=True, 
+            x=x_cs, y=x_cs[:2,:], scale=None, cm=False, use_jac=True,
             init=[0.2, -0.4, 0.5, -0.1, 1])
         np_test.assert_almost_equal(np.dot(res.gl, x_cs), x_cs, decimal=3)
         np_test.assert_almost_equal(res.gl, np.identity(3), decimal=3)
@@ -404,7 +404,7 @@ class TestRigid3D(np_test.TestCase):
         # doesn't find optimal without scale optimization
         # still fails when -np.sqrt(0.55)
         res = Rigid3D.find_32_constr_ck(
-            x=x_cs, y=x_cs[:2,:], scale=None, cm=False, use_jac=True, 
+            x=x_cs, y=x_cs[:2,:], scale=None, cm=False, use_jac=True,
             init=[0.2, -0.4, 0.5, np.sqrt(0.55), 1])
         y = np.array([[0., 0, -2, 0],
                       [0, 1, 0, 0],
@@ -419,7 +419,7 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler([np.pi/2, 6 * np.pi/5, -np.pi/2])
         y = np.dot(r, x_cs)
         res = Rigid3D.find_32_constr_ck(
-            x=x_cs, y=y[:2,:], scale=None, cm=False, use_jac=True) 
+            x=x_cs, y=y[:2,:], scale=None, cm=False, use_jac=True)
         np_test.assert_almost_equal(res.y[2,:], y[2,:], decimal=3)
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.s_scalar, 1, decimal=3)
@@ -462,7 +462,7 @@ class TestRigid3D(np_test.TestCase):
         np_test.assert_almost_equal(res.gl, r, decimal=3)
         np_test.assert_almost_equal(res.s_scalar, 1, decimal=3)
         np_test.assert_almost_equal(
-            Rigid3D.extract_euler(res.gl, mode='x'), 
+            Rigid3D.extract_euler(res.gl, mode='x'),
             angles, decimal=3)
 
         # low z example 2
@@ -474,7 +474,7 @@ class TestRigid3D(np_test.TestCase):
         x_cm = x - x.mean(axis=-1).reshape((3,1))
         r = Rigid3D.make_r_euler(angles, mode='x')
         res = Rigid3D.find_32_constr_ck(
-            x=x_cm, y=scale * np.dot(r, x_cm)[:2,:], scale=None, cm=False, 
+            x=x_cm, y=scale * np.dot(r, x_cm)[:2,:], scale=None, cm=False,
             use_jac=True)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
         np_test.assert_almost_equal(
@@ -482,7 +482,7 @@ class TestRigid3D(np_test.TestCase):
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.s_scalar, scale, decimal=3)
         np_test.assert_almost_equal(
-            Rigid3D.extract_euler(res.q, mode='x'), 
+            Rigid3D.extract_euler(res.q, mode='x'),
             angles, decimal=3)
 
         # low z example 3
@@ -495,7 +495,7 @@ class TestRigid3D(np_test.TestCase):
         x_cm = x - x.mean(axis=-1).reshape((3,1))
         r = Rigid3D.make_r_euler(angles, mode='x')
         res = Rigid3D.find_32_constr_ck(
-            x=x_cm, y=scale * np.dot(r, x_cm)[:2,:], scale=None, cm=False, 
+            x=x_cm, y=scale * np.dot(r, x_cm)[:2,:], scale=None, cm=False,
             use_jac=True, init=[0.2, -0.4, 0.5, -np.sqrt(0.55), 1])
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
         np_test.assert_almost_equal(
@@ -503,7 +503,7 @@ class TestRigid3D(np_test.TestCase):
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.s_scalar, scale, decimal=3)
         np_test.assert_almost_equal(
-            Rigid3D.extract_euler(res.q, mode='x'), 
+            Rigid3D.extract_euler(res.q, mode='x'),
             angles, decimal=3)
 
         # low z example 3
@@ -517,14 +517,14 @@ class TestRigid3D(np_test.TestCase):
         x_cm = x - x.mean(axis=-1).reshape((3,1))
         r = Rigid3D.make_r_euler(angles, mode='x')
         res = Rigid3D.find_32_constr_ck(
-            x=x_cm, y=scale * np.dot(r, x_cm)[:2,:], scale=None, cm=False, 
+            x=x_cm, y=scale * np.dot(r, x_cm)[:2,:], scale=None, cm=False,
             use_jac=True, init=[-0.4, -0.41, 0.8, 0.2, 1])
         if abs(res.optimizeResult.fun) > 0.001:
-            print "\n"*2
-            print "="*50
-            print "OPTIMIZATION FAILED! Known problem on some platform. Please ignore!"
-            print "="*50
-            print "\n"*2
+            print("\n"*2)
+            print("="*50)
+            print("OPTIMIZATION FAILED! Known problem on some platform. Please ignore!")
+            print("="*50)
+            print("\n"*2)
         else:
             np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
             np_test.assert_almost_equal(
@@ -532,7 +532,7 @@ class TestRigid3D(np_test.TestCase):
             np_test.assert_almost_equal(res.q, r, decimal=3)
             np_test.assert_almost_equal(res.s_scalar, scale, decimal=3)
             np_test.assert_almost_equal(
-                Rigid3D.extract_euler(res.q, mode='x'), 
+                Rigid3D.extract_euler(res.q, mode='x'),
                 angles, decimal=3)
 
     def test_find_32_constr_ck_multi(self):
@@ -549,7 +549,7 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler([0., 6 * np.pi/5, 0.])
         res = Rigid3D.find_32_constr_ck_multi(
             x=x_cs, y=np.dot(r, x_cs)[:2,:], scale=1, cm=False, use_jac=True,
-            ninit=self.ninit, randome=True, randoms=False) 
+            ninit=self.ninit, randome=True, randoms=False)
         np_test.assert_almost_equal(res.y[2,:], np.dot(r, x_cs)[2,:], decimal=3)
         np_test.assert_almost_equal(res.gl, r, decimal=3)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
@@ -558,7 +558,7 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler([np.pi/2, 6 * np.pi/5, -np.pi/2])
         res = Rigid3D.find_32_constr_ck_multi(
             x=x_cs, y=np.dot(r, x_cs)[:2,:], scale=1, cm=False, use_jac=True,
-            ninit=self.ninit, randome=True, randoms=False) 
+            ninit=self.ninit, randome=True, randoms=False)
         np_test.assert_almost_equal(res.y[2,:], np.dot(r, x_cs)[2,:], decimal=3)
         np_test.assert_almost_equal(res.gl, r, decimal=3)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
@@ -567,7 +567,7 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler([np.pi/2, np.pi, -np.pi/2])
         res = Rigid3D.find_32_constr_ck_multi(
             x=x_cs, y=np.dot(r, x_cs)[:2,:], scale=1, cm=False, use_jac=True,
-            ninit=self.ninit, randome=True, randoms=False) 
+            ninit=self.ninit, randome=True, randoms=False)
         np_test.assert_almost_equal(res.y[2,:], np.dot(r, x_cs)[2,:], decimal=3)
         np_test.assert_almost_equal(res.gl, r, decimal=3)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
@@ -582,7 +582,7 @@ class TestRigid3D(np_test.TestCase):
         x_cm = x - x.mean(axis=-1).reshape((3,1))
         r = Rigid3D.make_r_euler(angles, mode='x')
         res = Rigid3D.find_32_constr_ck_multi(
-            x=x_cm, y=scale * np.dot(r, x_cm)[:2,:], scale=None, cm=False, 
+            x=x_cm, y=scale * np.dot(r, x_cm)[:2,:], scale=None, cm=False,
             use_jac=True, ninit=self.ninit, randome=True, randoms=True)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
         np_test.assert_almost_equal(
@@ -590,11 +590,11 @@ class TestRigid3D(np_test.TestCase):
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.s_scalar, scale, decimal=3)
         np_test.assert_almost_equal(
-            Rigid3D.extract_euler(res.q, mode='x'), 
+            Rigid3D.extract_euler(res.q, mode='x'),
             angles, decimal=3)
 
         # low z example 3, random init e, fixed scale
-        # Note: fails with the default init e 
+        # Note: fails with the default init e
         x = np.array([[3.2, 7.8, 0.3, 4, 5],
                       [1.3, 3.6, 5.4, 6, 3.8],
                       [0.1, 0.5, 0.8, 0.2, 0.3]])
@@ -602,18 +602,18 @@ class TestRigid3D(np_test.TestCase):
         x_cm = x - x.mean(axis=-1).reshape((3,1))
         r = Rigid3D.make_r_euler(angles, mode='x')
         res = Rigid3D.find_32_constr_ck_multi(
-            x=x_cm, y=np.dot(r, x_cm)[:2,:], scale=1, cm=False, 
+            x=x_cm, y=np.dot(r, x_cm)[:2,:], scale=1, cm=False,
             use_jac=True, ninit=self.ninit, randome=True, randoms=False)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
         np_test.assert_almost_equal(
             res.y[2,:], np.dot(r, x_cm)[2,:], decimal=3)
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(
-            Rigid3D.extract_euler(res.q, mode='x'), 
+            Rigid3D.extract_euler(res.q, mode='x'),
             angles, decimal=3)
 
         # low z example 3, random init e and scale, optimize scale
-        # fails for some init conditions (including default), even if init 
+        # fails for some init conditions (including default), even if init
         # scale close to correct
         x = np.array([[3.2, 7.8, 0.3, 4, 5],
                       [1.3, 3.6, 5.4, 6, 3.8],
@@ -623,7 +623,7 @@ class TestRigid3D(np_test.TestCase):
         x_cm = x - x.mean(axis=-1).reshape((3,1))
         r = Rigid3D.make_r_euler(angles, mode='x')
         res = Rigid3D.find_32_constr_ck_multi(
-            x=x_cm, y=scale * np.dot(r, x_cm)[:2,:], scale=None, cm=False, 
+            x=x_cm, y=scale * np.dot(r, x_cm)[:2,:], scale=None, cm=False,
             use_jac=True, ninit=self.ninit, randome=True, randoms=True)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
         np_test.assert_almost_equal(
@@ -631,11 +631,11 @@ class TestRigid3D(np_test.TestCase):
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.s_scalar, scale, decimal=3)
         np_test.assert_almost_equal(
-            Rigid3D.extract_euler(res.q, mode='x'), 
+            Rigid3D.extract_euler(res.q, mode='x'),
             angles, decimal=3)
 
         # low z example 3
-        # fails for some init conditions (eg [0.4, -0.3, 0.8, 0.2, 1]), 
+        # fails for some init conditions (eg [0.4, -0.3, 0.8, 0.2, 1]),
         # even if init scale close to correct
         x = np.array([[3.2, 7.8, 0.3, 4, 5],
                       [1.3, 3.6, 5.4, 6, 3.8],
@@ -645,7 +645,7 @@ class TestRigid3D(np_test.TestCase):
         x_cm = x - x.mean(axis=-1).reshape((3,1))
         r = Rigid3D.make_r_euler(angles, mode='x')
         res = Rigid3D.find_32_constr_ck_multi(
-            x=x_cm, y=scale * np.dot(r, x_cm)[:2,:], scale=None, cm=False, 
+            x=x_cm, y=scale * np.dot(r, x_cm)[:2,:], scale=None, cm=False,
             use_jac=True, ninit=self.ninit, randome=True, randoms=True)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
         np_test.assert_almost_equal(
@@ -653,7 +653,7 @@ class TestRigid3D(np_test.TestCase):
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.s_scalar, scale, decimal=3)
         np_test.assert_almost_equal(
-            Rigid3D.extract_euler(res.q, mode='x'), 
+            Rigid3D.extract_euler(res.q, mode='x'),
             angles, decimal=3)
 
     def test_find_32(self):
@@ -682,7 +682,7 @@ class TestRigid3D(np_test.TestCase):
             randoms=False)
         np_test.assert_almost_equal(res.y[:2,:], y[:2,:], decimal=3)
         np_test.assert_almost_equal(
-            res.y[2,:] - res.y[2:].mean(), 
+            res.y[2,:] - res.y[2:].mean(),
             y[2,:] - y[2:].mean(), decimal=3)
         np_test.assert_almost_equal(res.d[:2], d[:2], decimal=3)
         np_test.assert_almost_equal(res.gl, r, decimal=3)
@@ -699,7 +699,7 @@ class TestRigid3D(np_test.TestCase):
             randoms=False)
         np_test.assert_almost_equal(res.y[:2,:], y[:2,:], decimal=3)
         np_test.assert_almost_equal(
-            res.y[2,:] - res.y[2:].mean(), 
+            res.y[2,:] - res.y[2:].mean(),
             y[2,:] - y[2:].mean(), decimal=3)
         np_test.assert_almost_equal(res.d[:2], d[:2], decimal=3)
         np_test.assert_almost_equal(res.gl, s * r, decimal=3)
@@ -710,7 +710,7 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler([8 * np.pi/9, 0, 0])
         y = np.dot(r, x_cs)
         res = Rigid3D.find_32(
-            x=x_cs, y=np.dot(r, x_cs)[:2,:], scale=1, use_jac=True, ninit=1, 
+            x=x_cs, y=np.dot(r, x_cs)[:2,:], scale=1, use_jac=True, ninit=1,
             randome=False, einit=[0.2, -0.4, 0.5, np.sqrt(0.55)], randoms=False)
         np_test.assert_almost_equal(res.gl, r, decimal=3)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
@@ -722,7 +722,7 @@ class TestRigid3D(np_test.TestCase):
         d = np.array([-3, -45., 17])
         y = s * np.dot(r, x_cs) + np.expand_dims(d, 1)
         res = Rigid3D.find_32(
-            x=x_cs, y=y[:2,:], scale=None, use_jac=True, ninit=1, 
+            x=x_cs, y=y[:2,:], scale=None, use_jac=True, ninit=1,
             randome=False, einit=[0.2, -0.4, 0.5, np.sqrt(0.55)], randoms=False)
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.s_scalar, s, decimal=3)
@@ -736,7 +736,7 @@ class TestRigid3D(np_test.TestCase):
         d = np.array([-3, -45., 17])
         y = s * np.dot(r, x_cs) + np.expand_dims(d, 1)
         res = Rigid3D.find_32(
-            x=x_cs, y=y[:2,:], scale=None, use_jac=True, ninit=1, 
+            x=x_cs, y=y[:2,:], scale=None, use_jac=True, ninit=1,
             randome=False, randoms=False, sinit=0.5)
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.s_scalar, s, decimal=3)
@@ -750,8 +750,8 @@ class TestRigid3D(np_test.TestCase):
         d = np.array([-3, -45., 17])
         y = s * np.dot(r, x_cs) + np.expand_dims(d, 1)
         res = Rigid3D.find_32(
-            x=x_cs, y=y[:2,:], scale=None, use_jac=True, ninit=1, 
-            randome=False, einit=[0.2, -0.4, 0.5, np.sqrt(0.55)], 
+            x=x_cs, y=y[:2,:], scale=None, use_jac=True, ninit=1,
+            randome=False, einit=[0.2, -0.4, 0.5, np.sqrt(0.55)],
             randoms=False, sinit=0.5)
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.s_scalar, s, decimal=3)
@@ -767,11 +767,11 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler(angles, mode='x')
         y = s * np.dot(r, x_low_z) + np.expand_dims(d, 1)
         #res = Rigid3D.find_32(
-        #    x=x_low_z, y=y[:2,:], scale=None use_jac=True, ninit=1, 
+        #    x=x_low_z, y=y[:2,:], scale=None use_jac=True, ninit=1,
         #    randome=False, randoms=False)
         #np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
         res = Rigid3D.find_32(
-            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=1, 
+            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=1,
             randome=False, einit=[0.6, -0.5, 0.3, np.sqrt(0.3)], randoms=False)
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
@@ -785,7 +785,7 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler(angles, mode='x')
         y = s * np.dot(r, x_low_z) + np.expand_dims(d, 1)
         res = Rigid3D.find_32(
-            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=1, 
+            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=1,
             randome=False, randoms=False, sinit=0.2)
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
@@ -799,7 +799,7 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler(angles, mode='x')
         y = s * np.dot(r, x_low_z) + np.expand_dims(d, 1)
         res = Rigid3D.find_32(
-            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=1, 
+            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=1,
             randome=False, einit='gl2', randoms=False, sinit='gl2')
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
@@ -812,7 +812,7 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler(angles, mode='x')
         y = s * np.dot(r, x_low_z) + np.expand_dims(d, 1)
         res = Rigid3D.find_32(
-            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit, 
+            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit,
             randome=True, einit=None, randoms=False, sinit=0.2)
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
@@ -825,7 +825,7 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler(angles, mode='x')
         y = s * np.dot(r, x_low_z) + np.expand_dims(d, 1)
         res = Rigid3D.find_32(
-            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit, 
+            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit,
             randome=False, einit=None, randoms=True, sinit=0.2)
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
@@ -838,7 +838,7 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler(angles, mode='x')
         y = s * np.dot(r, x_low_z) + np.expand_dims(d, 1)
         res = Rigid3D.find_32(
-            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit, 
+            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit,
             randome=True, einit=None, randoms=True, sinit=None)
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
@@ -851,7 +851,7 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler(angles, mode='x')
         y = s * np.dot(r, x_low_z) + np.expand_dims(d, 1)
         res = Rigid3D.find_32(
-            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit, 
+            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit,
             randome=True, einit=[1,0,0,0], randoms=False, sinit=0.2)
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
@@ -864,7 +864,7 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler(angles, mode='x')
         y = s * np.dot(r, x_low_z) + np.expand_dims(d, 1)
         res = Rigid3D.find_32(
-            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit, 
+            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit,
             randome=False, einit=[1,0,0,0], randoms=True, sinit=0.2)
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
@@ -877,7 +877,7 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler(angles, mode='x')
         y = s * np.dot(r, x_low_z) + np.expand_dims(d, 1)
         res = Rigid3D.find_32(
-            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit, 
+            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit,
             randome=True, einit=[1,0,0,0], randoms=True, sinit=0.2)
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
@@ -890,7 +890,7 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler(angles, mode='x')
         y = s * np.dot(r, x_low_z) + np.expand_dims(d, 1)
         res = Rigid3D.find_32(
-            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit, 
+            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit,
             randome=True, einit='gl2', randoms=False, sinit=0.2)
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
@@ -903,7 +903,7 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler(angles, mode='x')
         y = s * np.dot(r, x_low_z) + np.expand_dims(d, 1)
         res = Rigid3D.find_32(
-            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit, 
+            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit,
             randome=False, einit=[1,0,0,0], randoms=True, sinit='gl2')
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
@@ -916,7 +916,7 @@ class TestRigid3D(np_test.TestCase):
         r = Rigid3D.make_r_euler(angles, mode='x')
         y = s * np.dot(r, x_low_z) + np.expand_dims(d, 1)
         res = Rigid3D.find_32(
-            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit, 
+            x=x_low_z, y=y[:2,:], scale=None, use_jac=True, ninit=self.ninit,
             randome=True, einit='gl2', randoms=True, sinit='gl2')
         np_test.assert_almost_equal(res.q, r, decimal=3)
         np_test.assert_almost_equal(res.optimizeResult.fun, 0, decimal=3)
@@ -926,7 +926,7 @@ class TestRigid3D(np_test.TestCase):
         """
         Test approx_gl2_to_ck3()
         """
-        
+
         # coord system-like points
         x = np.array([[0., 1, 0, -1],
                       [0, 0, 2, -1],
@@ -1013,7 +1013,7 @@ class TestRigid3D(np_test.TestCase):
         """
         Test gl2_to_ck3()
         """
-        
+
         # make 3D r from known Gl and check angles
         euler = np.array([70, 50, -30.]) * np.pi / 180
         u = Affine2D.makeQ(euler[2])
@@ -1036,13 +1036,13 @@ class TestRigid3D(np_test.TestCase):
         """
 
         # invert angle
-        res = np.dot(Rigid3D.make_r_ck([0.2, 0.4, 0.3, np.sqrt(0.71)]), 
+        res = np.dot(Rigid3D.make_r_ck([0.2, 0.4, 0.3, np.sqrt(0.71)]),
                      Rigid3D.make_r_ck([-0.2, 0.4, 0.3, np.sqrt(0.71)]))
         np_test.assert_almost_equal(res, np.identity(3))
         np_test.assert_almost_equal(res, np.identity(3))
 
         # invert axis
-        res = np.dot(Rigid3D.make_r_ck([0.5, 0.4, 0.6, np.sqrt(0.23)]), 
+        res = np.dot(Rigid3D.make_r_ck([0.5, 0.4, 0.6, np.sqrt(0.23)]),
                      Rigid3D.make_r_ck([0.5, -0.4, -0.6, -np.sqrt(0.23)]))
         np_test.assert_almost_equal(res, np.identity(3))
         np_test.assert_almost_equal(res, np.identity(3))
@@ -1053,12 +1053,12 @@ class TestRigid3D(np_test.TestCase):
         """
 
         # arbitrary rotation and inverse
-        res = np.dot(Rigid3D.make_r_euler([1., 2, 3]), 
+        res = np.dot(Rigid3D.make_r_euler([1., 2, 3]),
                      Rigid3D.make_r_euler([-3., -2, -1]))
         np_test.assert_almost_equal(res, np.identity(3))
 
         # arbitrary rotation and inverse
-        res = np.dot(Rigid3D.make_r_euler([-0.5, 1.2, 2.8]), 
+        res = np.dot(Rigid3D.make_r_euler([-0.5, 1.2, 2.8]),
                      Rigid3D.make_r_euler([-2.8, -1.2, 0.5]))
         np_test.assert_almost_equal(res, np.identity(3))
 
@@ -1087,7 +1087,7 @@ class TestRigid3D(np_test.TestCase):
 
     def test_euler_to_ck(self):
         """
-        Tests euler_to_ck(). 
+        Tests euler_to_ck().
 
         Assumes make_r_euler() and make_r_ck() are correct.
         """
@@ -1119,7 +1119,7 @@ class TestRigid3D(np_test.TestCase):
 
             # arbitrary center
             distance = 0.1
-            center = [0.5, -0.7, 0.2, -np.sqrt(0.22)] 
+            center = [0.5, -0.7, 0.2, -np.sqrt(0.22)]
             res = Rigid3D.make_random_ck(center=center, distance=distance)
             np_test.assert_almost_equal(np.square(res).sum(), 1)
             r_center = Rigid3D.make_r_ck(center)
@@ -1152,7 +1152,7 @@ class TestRigid3D(np_test.TestCase):
         y_desired = s * np.dot(r, x_cs)
         y = rigid3d.transform(x=x_cs)
         np_test.assert_almost_equal(y, y_desired)
-        
+
         # xy_axes=dim_point
         rigid3d = Rigid3D()
         rigid3d.q = r
@@ -1161,20 +1161,20 @@ class TestRigid3D(np_test.TestCase):
         y_desired = s * np.dot(r, x_cs) + np.expand_dims(d, 1)
         y = rigid3d.transform(x=x_cs)
         np_test.assert_almost_equal(y, y_desired)
-        
+
         # xy_axes=dim_point
         rigid3d = Rigid3D()
         rigid3d.s_scalar = s
         y_desired = s * np.dot(r, x_cs)
         y = rigid3d.transform(x=x_cs, q=r)
         np_test.assert_almost_equal(y, y_desired)
-        
+
         # xy_axes=dim_point
         rigid3d = Rigid3D()
         y_desired = s * np.dot(r, x_cs) + np.expand_dims(d, 1)
         y = rigid3d.transform(x=x_cs, q=r, s=s, d=d)
         np_test.assert_almost_equal(y, y_desired)
-        
+
         # xy_axes=dim_point, xy_axes='point_dim'
         rigid3d = Rigid3D()
         rigid3d.q = r
@@ -1183,13 +1183,13 @@ class TestRigid3D(np_test.TestCase):
         y_desired = s * np.inner(x_cs.transpose(), r) + d
         y = rigid3d.transform(x=x_cs.transpose(), xy_axes='point_dim')
         np_test.assert_almost_equal(y, y_desired)
-        
+
         # d=None, xy_axes='point_dim'
         rigid3d = Rigid3D()
         y_desired = s * np.inner(x_cs.transpose(), r)
         y = rigid3d.transform(x=x_cs.transpose(), q=r, s=s, xy_axes='point_dim')
         np_test.assert_almost_equal(y, y_desired)
-        
+
     def test_recalculate_translation(self):
         """
         Tests recalculate_translation()
@@ -1203,7 +1203,7 @@ class TestRigid3D(np_test.TestCase):
         #r3d.d = np.array([1,2,0])
         center = np.array([0,1,0]).reshape(3,1)
         np_test.assert_almost_equal(
-            r3d.recalculate_translation(rotation_center=center), 
+            r3d.recalculate_translation(rotation_center=center),
             np.array([-2, -2, 0]).reshape((3,1)))
 
         # with initial translation
@@ -1214,7 +1214,7 @@ class TestRigid3D(np_test.TestCase):
         r3d.d = np.array([1,3,1])
         center = np.array([0,1,0]).reshape(3,1)
         np_test.assert_almost_equal(
-            r3d.recalculate_translation(rotation_center=center), 
+            r3d.recalculate_translation(rotation_center=center),
             np.array([-1, 1, 1]).reshape((3,1)))
 
         # center point_dim form, with initial translation
@@ -1225,7 +1225,7 @@ class TestRigid3D(np_test.TestCase):
         r3d.d = np.array([-1,3,1])
         center = np.array([0,1,0]).reshape(1,3)
         np_test.assert_almost_equal(
-            r3d.recalculate_translation(rotation_center=center), 
+            r3d.recalculate_translation(rotation_center=center),
             np.array([-3, 1, 1]).reshape((1,3)))
 
         # center 1d form, with initial translation
@@ -1236,7 +1236,7 @@ class TestRigid3D(np_test.TestCase):
         r3d.d = np.array([1,3,1])
         center = np.array([0,1,0]).reshape(1,3)
         np_test.assert_almost_equal(
-            r3d.recalculate_translation(rotation_center=center), 
+            r3d.recalculate_translation(rotation_center=center),
             np.array([-1, 1, 1]).reshape((1,3)))
 
         # another example with initial translation
@@ -1247,7 +1247,7 @@ class TestRigid3D(np_test.TestCase):
         r3d.d = np.array([1,3,1])
         center = np.array([2,0,0]).reshape(3,1)
         np_test.assert_almost_equal(
-            r3d.recalculate_translation(rotation_center=center), 
+            r3d.recalculate_translation(rotation_center=center),
             np.array([-5, 9, 1]).reshape((3,1)))
 
         # mimick rotation around another center
@@ -1260,10 +1260,10 @@ class TestRigid3D(np_test.TestCase):
         y_desired = r3d.transform(x=x)
         center = np.array([2,0,0]).reshape(3,1)
         y_actual = (
-            r3d.s_scalar * (np.dot(r3d.q, x-center) + center) 
+            r3d.s_scalar * (np.dot(r3d.q, x-center) + center)
             + r3d.recalculate_translation(rotation_center=center))
         np_test.assert_almost_equal(y_actual, y_desired)
- 
+
         # mimick rotation around another center, more complicated
         r3d = Rigid3D()
         r3d.s_scalar = 2.5
@@ -1274,10 +1274,10 @@ class TestRigid3D(np_test.TestCase):
         y_desired = r3d.transform(x=x)
         center = np.array([3,2,1]).reshape(3,1)
         y_actual = (
-            r3d.s_scalar * (np.dot(r3d.q, x-center) + center) 
+            r3d.s_scalar * (np.dot(r3d.q, x-center) + center)
             + r3d.recalculate_translation(rotation_center=center))
         np_test.assert_almost_equal(y_actual, y_desired)
- 
+
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestRigid3D)

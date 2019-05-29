@@ -1,5 +1,5 @@
 """
-Contains class Rigid3D for preforming rigid body transformation and scalar 
+Contains class Rigid3D for preforming rigid body transformation and scalar
 scaling followed by translation on points (vectors).
 
 # Author: Vladan Lucic (Max Planck Institute of Biochemistry)
@@ -16,13 +16,13 @@ import scipy as sp
 # added for sp.stat
 import scipy.stats
 
-from affine import Affine
+from .affine import Affine
 
 class Rigid3D(Affine):
     """
 
-    Note that in this class xy_axes is always 'dim_point' except in 
-    methods that take xy_axes as an argumnet. This is  opposite from 
+    Note that in this class xy_axes is always 'dim_point' except in
+    methods that take xy_axes as an argumnet. This is  opposite from
     Affine where 'pint_dim' is the default, but both values can be used.
 
     Xy axes given by 'dim_point' mean that a matrix specifying n points
@@ -58,7 +58,7 @@ class Rigid3D(Affine):
         Returnes an identity transformation.
         """
 
-        obj = cls.__base__.identity(ndim=3)        
+        obj = cls.__base__.identity(ndim=3)
         return obj
 
     @classmethod
@@ -67,7 +67,7 @@ class Rigid3D(Affine):
         Returns scale transformation corresponding to 1D array scale.
 
         Argument:
-          - scale: can be given as an 1d array (or a list), or as a single 
+          - scale: can be given as an 1d array (or a list), or as a single
           number in which case the scale is the same in all directions
         """
 
@@ -77,9 +77,9 @@ class Rigid3D(Affine):
     @classmethod
     def makeP(cls, parity, axis=-1):
         """
-        Returns parity matrix corresponding to arg parity. 
+        Returns parity matrix corresponding to arg parity.
 
-        If parity is -1, the element of the parity matrix corresponding to 
+        If parity is -1, the element of the parity matrix corresponding to
         axis is set to -1 (all other are 1).
 
         Arguments:
@@ -93,7 +93,7 @@ class Rigid3D(Affine):
     @classmethod
     def makeD(cls, d):
         """
-        Returns d (translation) array corresponding to arg parity. 
+        Returns d (translation) array corresponding to arg parity.
 
         Arguments:
           - d: (single number) translation
@@ -127,45 +127,45 @@ class Rigid3D(Affine):
         Probably not needed
         """
         raise NotImplementedError()
-        
+
     @classmethod
     def removeMasked(cls):
         """
         Not needed
         """
         raise NotImplementedError()
-    
+
     #########################################################
     #
-    # Methods to find rigid transformations when incomplete marker 
+    # Methods to find rigid transformations when incomplete marker
     # points coordinates are given
     #
 
     @classmethod
     def find_32(
             cls, x, y, scale=None, use_jac=True, mode='constr_ck',
-            ninit=10, randome=False, einit=None, einit_dist=0.1, 
+            ninit=10, randome=False, einit=None, einit_dist=0.1,
             randoms=False, sinit=1., maxiter=1000, return_all=False):
         """
-        Finds optimal 3D transformation consisting of rotation, scale 
-        (optional) and translation that transform initial point coordinates 
-        (arg x) to final coordinates (arg y) when only x and y but not z 
+        Finds optimal 3D transformation consisting of rotation, scale
+        (optional) and translation that transform initial point coordinates
+        (arg x) to final coordinates (arg y) when only x and y but not z
         components of the fnal coordinates are specified.
 
         For the optimization, 3D rotation, translation (x and y coordinates)
-        and scale (scalar) are found that minimize the sum of squared 
-        differences between points y and x and y components of transformed 
-        points x. 3D rotation is parametrized by Caley-Klein parameters 
-        (closely related to quaternions). The optimization is performed by 
+        and scale (scalar) are found that minimize the sum of squared
+        differences between points y and x and y components of transformed
+        points x. 3D rotation is parametrized by Caley-Klein parameters
+        (closely related to quaternions). The optimization is performed by
         function sp.optimize.minimize() under the constraints ensuring that
         Caley-Klein parameters are normalized to 1 and that each of them is
         between -1 and 1 and that the scale is larger than 0.
 
         The optimization procedure is typically repeated several times (arg
-        ninit, but also randome and randoms) and the best solution is 
-        retained. These runs differ by inital parameter values. The reason 
-        is that the optimal solution is not found for some combinations of 
-        initial and final coordinates and initial parameter values. A 
+        ninit, but also randome and randoms) and the best solution is
+        retained. These runs differ by inital parameter values. The reason
+        is that the optimal solution is not found for some combinations of
+        initial and final coordinates and initial parameter values. A
         limited number of runs (around 10) typically suficces to obtain
         the optimal solution.
 
@@ -174,36 +174,36 @@ class Rigid3D(Affine):
         In the latter case args randoms and sint are not considered.
 
         If args randome and randoms are both False, only one optimization run
-        is performed (two if einit is 'gl2'), regrdless of the specified value 
-        of arg ninit. Otherwise, ninit optimizations are run. 
+        is performed (two if einit is 'gl2'), regrdless of the specified value
+        of arg ninit. Otherwise, ninit optimizations are run.
 
-        If args einit or sinit are set to 'gl2', 2D affine transformation 
+        If args einit or sinit are set to 'gl2', 2D affine transformation
         (only the GL(2) part) is calculated based on the x and y coomponents
         of the initial coordinates (arg x) and on the final coordinates
-        (arg y). Singular value decomposition of the resulting GL(2) 
-        transformation yields two rotations and two scales, which approximates 
-        the 3D rotation (exact if all initial point lie on the same z-plane). 
-        Namely, the rotations correspond to the Euler rotations around z axis 
-        (phi and psi), while the scales can be related to the Euler rotation 
-        around x-axis (theta). Theere is an inherent degeneracy in this 
+        (arg y). Singular value decomposition of the resulting GL(2)
+        transformation yields two rotations and two scales, which approximates
+        the 3D rotation (exact if all initial point lie on the same z-plane).
+        Namely, the rotations correspond to the Euler rotations around z axis
+        (phi and psi), while the scales can be related to the Euler rotation
+        around x-axis (theta). Theere is an inherent degeneracy in this
         approach, because the same affine scales correspond to both
         +theta and -theta.
 
-        Initial 3D rotation parameter values and the number of runs (with 
+        Initial 3D rotation parameter values and the number of runs (with
         different initial parameters) is determined as follows:
 
           1) randome is False:
             - einit is None: default initial rotation
             - einit is specified: specified initial rotation
-            - einit == 'gl2': at least two runs with initial rotations 
+            - einit == 'gl2': at least two runs with initial rotations
             determined by two solutions of 2D affine transformation
 
           2) randome is True:
             - einit is None: ninit runs with random initial rotations
             - einit is specified: ninit runs with random initial rotations
             in the einit_dist neighborhood of einit
-            - einit == 'gl2': ninit runs with initial rotations in the 
-            einit_dist neighborhood of the two solutions of 2D affine 
+            - einit == 'gl2': ninit runs with initial rotations in the
+            einit_dist neighborhood of the two solutions of 2D affine
             transformation
 
         Initial scale value(s) is (are) deteremined as follows (only if
@@ -212,20 +212,20 @@ class Rigid3D(Affine):
           1) randoms is False:
             - sinit is None: default initial scale (1)
             - sinit is specified: specified initial scale
-            - sinit == 'gl2': initial scale determined by the solutions of 
+            - sinit == 'gl2': initial scale determined by the solutions of
             2D affine transformation
 
           2) randoms is True:
             - sinit is None: ninit runs with random initial scale centered
             around 1 (Maxwell-Boltzmann distributed, scale 1)
             - sinit is specified: ninit runs with random initial scale
-            centered around sinit (Maxwell-Boltzmann distributed, scale set 
+            centered around sinit (Maxwell-Boltzmann distributed, scale set
             to sinit)
-            - sinit == 'gl2': ninit runs with random initial scale 
-            centered around the 2d affine (GL2) solution (Maxwell-Boltzmann 
+            - sinit == 'gl2': ninit runs with random initial scale
+            centered around the 2d affine (GL2) solution (Maxwell-Boltzmann
             distributed, scale set to that of the affine transformation
- 
-        In cases where initial rotations and/or scale are specified and 
+
+        In cases where initial rotations and/or scale are specified and
         multiple runs a re performed, the first run uses the specified
         initial conditions, while the other are random.
 
@@ -255,7 +255,7 @@ class Rigid3D(Affine):
                 x=x_prime, y=y_prime, xy_axes='dim_point', ret='both')
         else:
             raise ValueError(
-                "Argument einit " + str(einit) + " was not understood") 
+                "Argument einit " + str(einit) + " was not understood")
 
         # find initial conditions for s
         if scale is None:
@@ -273,7 +273,7 @@ class Rigid3D(Affine):
                         x=x_prime, y=y_prime, xy_axes='dim_point', ret='both')
             else:
                 raise ValueError(
-                    "Argument sinit " + str(sinit) + " was not understood") 
+                    "Argument sinit " + str(sinit) + " was not understood")
 
         elif isinstance(sinit, (float, int)):
 
@@ -293,14 +293,14 @@ class Rigid3D(Affine):
 
             # standard (not gl2)
             res = cls.find_32_constr_ck_multi(
-                x=x_prime, y=y_prime, cm=False, use_jac=use_jac, 
-                randome=randome, einit=einit_loc, einit_dist=einit_dist, 
+                x=x_prime, y=y_prime, cm=False, use_jac=use_jac,
+                randome=randome, einit=einit_loc, einit_dist=einit_dist,
                 scale=scale, randoms=randoms, sinit=sinit_loc, maxiter=maxiter,
                 ninit=ninit_loc, return_all=return_all)
             if return_all:
                 rigid_cm, all_rigid_cm = res
             else:
-                best = res 
+                best = res
 
         else:
 
@@ -308,12 +308,12 @@ class Rigid3D(Affine):
             ninit_1 = max(int(ninit_loc / 2), 1)
             res_1 = cls.find_32_constr_ck_multi(
                 x=x_prime, y=y_prime, cm=False, use_jac=use_jac, ninit=ninit_1,
-                randome=randome, einit=einit_loc[0], einit_dist=einit_dist, 
+                randome=randome, einit=einit_loc[0], einit_dist=einit_dist,
                 randoms=randoms, sinit=sinit_loc, maxiter=maxiter)
             ninit_2 = max(ninit_loc - ninit_1, 1)
             res_2 = cls.find_32_constr_ck_multi(
                 x=x_prime, y=y_prime, cm=False, use_jac=use_jac, ninit=ninit_2,
-                randome=randome, einit=einit_loc[1], einit_dist=einit_dist, 
+                randome=randome, einit=einit_loc[1], einit_dist=einit_dist,
                 randoms=randoms, sinit=sinit_loc, maxiter=maxiter)
 
             if return_all:
@@ -321,21 +321,21 @@ class Rigid3D(Affine):
                 rigid_cm_2, all_rigid_cm_2 = res_2
                 all_rigid_cm = all_rigid_cm_1 + all_rigid_cm_2
             else:
-                rigid_cm_1 = res_1 
+                rigid_cm_1 = res_1
                 rigid_cm_2 = res_2
 
             if rigid_cm_1.optimizeResult.fun <= rigid_cm_2.optimizeResult.fun:
                 best = rigid_cm_1
             else:
                 best = rigid_cm_2
-           
+
         # get translation
         translation_2 = (
             y_cm - best.s_scalar * np.dot(best.q[0:2,:], x_cm))
         translation = np.vstack((translation_2, [0]))
 
         # calculate full y in original (non-center of mass) frame
-        y_3 = best.transform(x=x, d=translation.squeeze(1)) 
+        y_3 = best.transform(x=x, d=translation.squeeze(1))
 
         # save translation related attributes
         best.d = translation.reshape(3)
@@ -348,7 +348,7 @@ class Rigid3D(Affine):
     @classmethod
     def find_32_constr_ck_multi(
             cls, x, y, scale=None, cm=False, use_jac=True,
-            ninit=10, randome=False, einit=None, einit_dist=0.1, 
+            ninit=10, randome=False, einit=None, einit_dist=0.1,
             randoms=False, sinit=1., maxiter=1000, return_all=False):
         """
 
@@ -360,16 +360,16 @@ class Rigid3D(Affine):
 
         ToDo:
         If args randome and randoms are both False, only one optimization run
-        is performed, regrdless of the specified value 
-        of arg ninit. Otherwise, ninit optimizations are run. 
+        is performed, regrdless of the specified value
+        of arg ninit. Otherwise, ninit optimizations are run.
 
-        Initial 3D rotation parameter values and the number of runs (with 
+        Initial 3D rotation parameter values and the number of runs (with
         different initial parameters) is determined as follows:
 
           1) randome is False:
             - einit is None: default initial rotation
             - einit is specified: specified initial rotation
- 
+
           2) randome is True:
             - einit is None: ninit runs with random initial rotations
             - einit is specified: ninit runs with random initial rotations
@@ -386,19 +386,19 @@ class Rigid3D(Affine):
             - sinit is None: ninit runs with random initial scale centered
             around 1 (Maxwell-Boltzmann distributed, scale 1)
             - sinit is specified: ninit runs with random initial scale
-            centered around sinit (Maxwell-Boltzmann distributed, scale set 
+            centered around sinit (Maxwell-Boltzmann distributed, scale set
             to sinit)
- 
-        In cases where initial rotations and/or scale are specified and 
+
+        In cases where initial rotations and/or scale are specified and
         multiple runs a re performed, the first run uses the specified
         initial conditions, while the other are random.
 
 
- 
+
 
        Arguments:
           - return_all
-          
+
         """
 
         # default initial values
@@ -413,10 +413,10 @@ class Rigid3D(Affine):
             # initial ck params
             if randome:
                 if einit is None:
-                
+
                     # totally random ck params
                     one_einit = cls.make_random_ck(center=None)
-            
+
                 else:
 
                     # random around initial ck params
@@ -425,7 +425,7 @@ class Rigid3D(Affine):
                     else:
                         one_einit = cls.make_random_ck(
                             center=einit, distance=einit_dist)
-                    
+
             else:
 
                 # single param set, default or specified
@@ -444,7 +444,7 @@ class Rigid3D(Affine):
                         # random around 1
                         one_s_init = sp.stats.maxwell.rvs(
                             loc=0, scale=default_s)
-                        
+
                     else:
 
                         # random around init s
@@ -465,20 +465,20 @@ class Rigid3D(Affine):
                 one_init = np.hstack((one_einit, [one_s_init]))
 
             else:
-                
+
                 # don't optimize scale, init params only ck
                 one_init = one_einit
 
             # solve and see if best solution so far
             rigid = cls.find_32_constr_ck(
-                x=x, y=y, scale=scale, init=one_init, use_jac=use_jac, 
+                x=x, y=y, scale=scale, init=one_init, use_jac=use_jac,
                 maxiter=maxiter)
             all.append(rigid)
             try:
                 if rigid.optimizeResult.fun < best.optimizeResult.fun:
                     best = rigid
             except(NameError, AttributeError):
-                best = rigid        
+                best = rigid
 
         # return only the best solution or the best and all solutions
         if return_all:
@@ -488,20 +488,20 @@ class Rigid3D(Affine):
 
     @classmethod
     def find_32_constr_ck(
-            cls, x, y, scale=None, init=None, cm=False, use_jac=True, 
+            cls, x, y, scale=None, init=None, cm=False, use_jac=True,
             maxiter=1000):
         """
-        Finds rigid transformation in 3D that transforms points x (initial) 
-        into points y (final) when only the first two coordinates are given 
+        Finds rigid transformation in 3D that transforms points x (initial)
+        into points y (final) when only the first two coordinates are given
         for y (and all three for x).
 
         Uses sp.optimize.minimize() function to find the optimal solution.
 
-        If arg scale is None the optimization of transformation includes 
+        If arg scale is None the optimization of transformation includes
         a search for scale. Otherwise, if arg scale is a number, scale is
         fixed at this value.
 
-        If initial parameters are not specified (arg init is None), default 
+        If initial parameters are not specified (arg init is None), default
         initial parameters are used:
           - [1, 0, 0, 0, 1] if scale is None
           - [1, 0, 0, 0] if scale is bot None
@@ -510,15 +510,15 @@ class Rigid3D(Affine):
 
         After the transformation is calculated, it is applied to the initial
         coordinates (arg x) to yield transformed initial coordinates.
-        
+
         Arguments:
           - x: initial points coordinates (3 x n_points martix)
           - y: final points coordinates (2 x n_points matrix)
-          - scale: if None the optimization also solves for (scalar) scale 
+          - scale: if None the optimization also solves for (scalar) scale
           factor, otherwise scale fixed at the specified factor (so 1 for
           plane rigid body movement)
-          - init: (list or ndarray) initial parameters, the first four are 
-          Caley-Klein rotation paprameters and the fifth (in case arg 
+          - init: (list or ndarray) initial parameters, the first four are
+          Caley-Klein rotation paprameters and the fifth (in case arg
           scale is None) is the scale
           - cm: if True, initial and final coordinates are transformed to
           their respective center of mass systems
@@ -532,12 +532,12 @@ class Rigid3D(Affine):
           - q: rotation matrix
           - ck: Caley-Klein parameters corresponding to q
           - s, s_scalar: scale in matrix and scalar form
-          - y: transformed inital coordinates that include z 
+          - y: transformed inital coordinates that include z
           - optimizeResult: object returned by the optimization function
           (sp.optimize.minimize()) used
           - error: matrix of square errors (dimensions as arg y)
         """
- 
+
         # convert to CM coords
         if cm:
             x_prime = x - x.mean(axis=-1).reshape((3,1))
@@ -550,15 +550,15 @@ class Rigid3D(Affine):
         xxt = np.dot(x_prime, x_prime.transpose())
         yxt = np.dot(y_prime, x_prime.transpose())
         tryy = (y_prime * y_prime).sum()
-        
+
         # function to mimimize
         sq_diff_ck = partial(
-            cls.sq_diff_ck_23, scale=scale, xxt=xxt, yxt=yxt, 
+            cls.sq_diff_ck_23, scale=scale, xxt=xxt, yxt=yxt,
             make_r=cls.make_r_ck, const=tryy)
 
         # derivatives
         sq_diff_ck_deriv = partial(
-            cls.sq_diff_ck_23_deriv, scale=scale, yxt=yxt, xxt=xxt, 
+            cls.sq_diff_ck_23_deriv, scale=scale, yxt=yxt, xxt=xxt,
             make_r=cls.make_r_ck, make_r_deriv=cls.make_r_ck_deriv)
 
         # check if should use derivatives
@@ -661,7 +661,7 @@ class Rigid3D(Affine):
         y_3 = s * np.dot(r_33[2,:], x_prime)
         y_33 = np.vstack((y_prime, y_3))
 
-        # make instance 
+        # make instance
         inst = cls()
         inst.gl = s * r_33
         inst.q = r_33
@@ -687,18 +687,18 @@ class Rigid3D(Affine):
 
           E = tr( y^T y + s^2 x x^T r^T r - 2 s x y^T r)
         """
-        
+
         # parameters
         e0, e1, e2, e3 = param[:4]
         if scale is None:
             s = param[4]
         else:
             s = scale
-            
+
         # make r
         r_33 = make_r([e0, e1, e2, e3])
         r = r_33[:2,:]
-       
+
         # square differences: s^2 tr(x x_t r_t r) - 2 s tr(x y_t r)
         rtr = np.dot(r.transpose(), r)
         term_1 = s**2 * (xxt * rtr).sum()
@@ -711,10 +711,10 @@ class Rigid3D(Affine):
     def sq_diff_ck_23_deriv(
             cls, param, scale, yxt, xxt, make_r, make_r_deriv):
         """
-        Calculates derivative (Jacobian) of sum of square differences 
+        Calculates derivative (Jacobian) of sum of square differences
         in respect to Cayley-Klein parameters.
 
-          dE / de_u = 2 ((r x x^T)_pi - (y x^T)_pi) dr_pi / de_u 
+          dE / de_u = 2 ((r x x^T)_pi - (y x^T)_pi) dr_pi / de_u
           dE / ds = 2 tr(s x x^T r^T r - x y^T r)
         """
 
@@ -724,15 +724,15 @@ class Rigid3D(Affine):
             s = param[4]
         else:
             s = scale
-            
+
         # prepare matrices
         r = make_r(e=e_params)[:2,:]
         dr_de = make_r_deriv(e=e_params)[:,:2,:]
-        
+
         # calculate derivatives by e
         temp = 2 * s * (s * np.dot(r, xxt) - yxt)
         e_derivs = (temp * dr_de).sum(axis=1).sum(axis=1)
-        
+
         # derivative by scale, if needed
         if scale is None:
             rtr = np.dot(r.transpose(), r)
@@ -750,7 +750,7 @@ class Rigid3D(Affine):
         based on Gl(2) conversion to 3D rotation (and scale).
 
         The solution found has a degeneracy in the sign of theta. If arg
-        re is 'one', only one rotation is returned, if it's 'both', both 
+        re is 'one', only one rotation is returned, if it's 'both', both
         are returned.
 
         Arguments:
@@ -773,7 +773,7 @@ class Rigid3D(Affine):
             x2 = x[:,:2]
 
         # find 2d affine
-        from affine_2d import Affine2D
+        from .affine_2d import Affine2D
         affine22 = Affine2D.find(x2, y, xy_axes=xy_axes)
 
         # find corresponding ck params
@@ -784,13 +784,13 @@ class Rigid3D(Affine):
     @classmethod
     def gl2_to_ck3(cls, gl, ret='both'):
         """
-        Finds Cayley-Klein parameters for a 3D rotation and scale that 
+        Finds Cayley-Klein parameters for a 3D rotation and scale that
         corresponsds to Gl(2) transformation gl.
 
         The parametrs found give (Euler) theta between -pi/2 and pi/2.
 
         The solution found has a degeneracy in the sign of theta. If arg
-        re is 'one', only one rotation is returned, if it's 'both', both 
+        re is 'one', only one rotation is returned, if it's 'both', both
         are returned.
 
         Arguments:
@@ -804,9 +804,9 @@ class Rigid3D(Affine):
           - scale: (scalar) scale
         """
 
-        # SV decompose gl 
-        from affine import Affine
-        from affine_2d import Affine2D
+        # SV decompose gl
+        from .affine import Affine
+        from .affine_2d import Affine2D
         aff = Affine()
         u, p, s, v = aff.decomposeSV(gl=gl)
 
@@ -853,7 +853,7 @@ class Rigid3D(Affine):
 
         The form used agrees with Goldstein Classical Mechanics pg 153
         pg 153, Rotation matrix Wikipedia and with quaterinion-based rotation
-        on Quaternion Wikipedia where 
+        on Quaternion Wikipedia where
         (q_k, q_i, q_j, q_k) = (e_0, e_1, e_2, e_3).
         """
 
@@ -870,11 +870,11 @@ class Rigid3D(Affine):
     @classmethod
     def make_r_ck_deriv(cls, e):
         """
-        Returns derivatives of 3D rotation matrix in respect to Cayley-Klein 
-        parameters. 
+        Returns derivatives of 3D rotation matrix in respect to Cayley-Klein
+        parameters.
 
-        The returned value is 4x3x3 ndarray, where the first index denotes 
-        component of Cayley-Klein parameters in respect to which the 
+        The returned value is 4x3x3 ndarray, where the first index denotes
+        component of Cayley-Klein parameters in respect to which the
         derivatives are taken.
         """
 
@@ -888,7 +888,7 @@ class Rigid3D(Affine):
              # dr / dr_3
              [[-e[3], -e[0], e[1]], [e[0], -e[3], e[2]], [e[1], e[2], e[3]]]]
         )
-        
+
         return dr_de
 
     @classmethod
@@ -898,18 +898,18 @@ class Rigid3D(Affine):
 
         The matrix is defined so that it rotates points in space by angles
         phi, theta and psi, and not so that the coodinate system is transformed.
-        Therefore it is transpose of what's given in Goldstein, Classical 
-        mechanics, pg 147. 
+        Therefore it is transpose of what's given in Goldstein, Classical
+        mechanics, pg 147.
 
         Currently only the 'x' mode is implemented. In this form rotations
         occure around a fixed coordinate system (extrinsic), the rotation
         matrix pre-multiplies coordinates and the order of rotations is:
-        around z axis by phi, x by theta and z by psi. This form is the same 
+        around z axis by phi, x by theta and z by psi. This form is the same
         as given on Euler angles Wikipedia, Z1 X2 Z3 form where angle_1 is
         psi, angle 2 theta and angle 3 phi. It also the same as the (intrinsic)
-        form from Goldstein, Classical Mechanics, pg 147 when signs of all 
+        form from Goldstein, Classical Mechanics, pg 147 when signs of all
         angles changed.
-        
+
         Arguments:
           - angles: [phi, theta, psi]
           - mode: Euler angles convention
@@ -919,38 +919,38 @@ class Rigid3D(Affine):
 
             phi, theta, psi = angles
             r = np.array(
-                [[(np.cos(psi) * np.cos(phi) 
+                [[(np.cos(psi) * np.cos(phi)
                    - np.cos(theta) * np.sin(phi) * np.sin(psi)),
-                  (-np.sin(phi) * np.cos(psi) 
+                  (-np.sin(phi) * np.cos(psi)
                    - np.cos(theta) * np.sin(psi) * np.cos(phi)),
                   np.sin(theta) * np.sin(psi)],
-                 [(np.cos(phi) * np.sin(psi) 
+                 [(np.cos(phi) * np.sin(psi)
                    + np.cos(theta) * np.cos(psi) * np.sin(phi)),
-                  (-np.sin(psi) * np.sin(phi) 
+                  (-np.sin(psi) * np.sin(phi)
                    + np.cos(theta) * np.cos(phi) * np.cos(psi)),
                   -np.sin(theta) * np.cos(psi)],
                  [np.sin(phi) * np.sin(theta),
                   np.cos(phi) * np.sin(theta),
                   np.cos(theta)]])
- 
+
         elif mode == 'test':
 
             phi, theta, psi = angles
             r = np.array(
-                [[(np.cos(psi) * np.cos(phi) 
+                [[(np.cos(psi) * np.cos(phi)
                    - np.cos(theta) * np.sin(phi) * np.sin(psi)),
-                  (-np.sin(psi) * np.cos(phi) 
+                  (-np.sin(psi) * np.cos(phi)
                    - np.cos(theta) * np.sin(phi) * np.cos(psi)),
                   np.sin(theta) * np.sin(phi)],
-                 [(np.cos(psi) * np.sin(phi) 
+                 [(np.cos(psi) * np.sin(phi)
                    + np.cos(theta) * np.cos(phi) * np.sin(psi)),
-                  (-np.sin(psi) * np.sin(phi) 
+                  (-np.sin(psi) * np.sin(phi)
                    + np.cos(theta) * np.cos(phi) * np.cos(psi)),
                   -np.sin(theta) * np.cos(phi)],
                  [np.sin(psi) * np.sin(theta),
                   np.cos(psi) * np.sin(theta),
                   np.cos(theta)]])
- 
+
         else:
             raise ValueError(
                 "Mode " + mode + "is not defined. Currently implemented is "
@@ -963,8 +963,8 @@ class Rigid3D(Affine):
         """
         Calculates Euler angles from a rotation matrix.
 
-        Both posibilities are calculated, namely [phi, theta, psi] and 
-        [phi + pi, -theta, psi + pi].  
+        Both posibilities are calculated, namely [phi, theta, psi] and
+        [phi + pi, -theta, psi + pi].
 
         In case theta = 0 (degenerate case) the two calculated cases are
         [phi + psi, 0, 0] and [0, 0, phi + psi].
@@ -1062,7 +1062,7 @@ class Rigid3D(Affine):
                 + " mode 'x'")
 
         return res
-        
+
 
     @classmethod
     def make_random_ck(cls, center=None, distance=0.1):
@@ -1070,17 +1070,17 @@ class Rigid3D(Affine):
         Generates and returns Caley-Klein parameters for a random 3D rotation.
 
         If arg center is None, a completely random rotation is generated.
-        Alternatively, a random rotation is generated in the 
+        Alternatively, a random rotation is generated in the
         neighborhood of size (arg) distance, around the rotaition
         specified by arg center.
 
         If arg center is not None, arg distance needs to be specified.
 
-        Arg distance is in "Caley-Klein parameter units". It should not be 
+        Arg distance is in "Caley-Klein parameter units". It should not be
         larger than 0.57, while the value of 0.1 corresponds roughly to 15 deg.
 
         Arguments:
-          - center: (ndarray) 3D rotation parameters in terms of Caley-Klein 
+          - center: (ndarray) 3D rotation parameters in terms of Caley-Klein
           parameters
           - distance: (float) size (radius) of the neighborhood of center
           (in "Caley-Klein parameter units")
@@ -1095,7 +1095,7 @@ class Rigid3D(Affine):
             e_random = e_random / np.sqrt(np.square(e_random).sum())
 
         else:
-            
+
             # random around initial
             e_small_123 = (np.random.random(3) * 2. - 1) * distance
             e_small_0 = np.sqrt(1 - np.square(e_small_123).sum())
@@ -1113,17 +1113,17 @@ class Rigid3D(Affine):
     #
     # Other methods
     #
- 
+
     def transform(self, x, q=None, s=None, d=None, xy_axes=None):
         """
-        Applies transformation defined by q, s and d to points x. 
+        Applies transformation defined by q, s and d to points x.
 
         If q, s or d are None the corresponding attributes are used.
 
-        If the arg xy_axes is 'point_dim' / 'dim_point', points used in this 
-        instance should be specified as n_point x 3 / 3 x n_point 
+        If the arg xy_axes is 'point_dim' / 'dim_point', points used in this
+        instance should be specified as n_point x 3 / 3 x n_point
         matrices.
-        
+
         Arguments:
           - x: coordinates of one or more points
           - q: matrix representation of rotation
@@ -1136,9 +1136,9 @@ class Rigid3D(Affine):
           - transformed points in the same form as x, or None if x is None
           or has no elements
          """
-        
+
         # ToDo: use Affine.transform()
- 
+
         # set transformation params
         if xy_axes is None:
             xy_axes = self.xy_axes
@@ -1154,18 +1154,18 @@ class Rigid3D(Affine):
             d = np.asarray(d)
         else:
             raise ValueError("Argument d: ", d, " was not understood.")
-        
+
         # transformation
         if xy_axes == 'point_dim':
-                
-            # equivalent to matrix multiplication of gl and transposed x, 
+
+            # equivalent to matrix multiplication of gl and transposed x,
             y = s * np.inner(x, q) + d
 
         elif xy_axes == 'dim_point':
-            
+
             # just matrix product
             y = s * np.dot(q, x) + np.expand_dims(d, 1)
- 
+
         return y
 
     def recalculate_translation(self, rotation_center):
@@ -1173,7 +1173,7 @@ class Rigid3D(Affine):
         Recalculates translation when the current transformation is
         modified so that the rotation center is changed (not at the origin).
 
-        The rotation center can be specified as 1d, 1x3 or 3x1 array. The 
+        The rotation center can be specified as 1d, 1x3 or 3x1 array. The
         returned translation will have the same form as the center.
 
         Argument:
@@ -1200,7 +1200,7 @@ class Rigid3D(Affine):
             raise ValueError("Rotation center has to be 1d, 1x3 or 3x1 array")
 
         # make new translation
-        trans = (self.transform(x=center, xy_axes='dim_point') 
+        trans = (self.transform(x=center, xy_axes='dim_point')
                  - self.s_scalar * center)
 
         # convert to the input form
@@ -1209,7 +1209,7 @@ class Rigid3D(Affine):
         elif xy_axes == 'point_dim':
             trans = trans.reshape((1,3))
 
-        return trans        
+        return trans
 
 
     #########################################################
@@ -1218,7 +1218,7 @@ class Rigid3D(Affine):
     #
     # Should not be used.
     #
-    # Probably implemented correctly but methods mostly don't work. Not 
+    # Probably implemented correctly but methods mostly don't work. Not
     # tested properly
     #
 
@@ -1227,13 +1227,13 @@ class Rigid3D(Affine):
         """
         Not correct
         """
- 
+
         raise NotImplementedError("Sorry, this is still work in progress.")
 
         # convert to CM coords
         x_cm = x - x.mean(axis=-1).reshape((3,1))
         y_cm = y - y.mean(axis=-1).reshape((2,1))
-   
+
         #
         def residuals(params, x=x_cm, y=y_cm, make_r=cls.make_r_euler):
             """
@@ -1267,7 +1267,7 @@ class Rigid3D(Affine):
         Singular martix error
         """
         raise NotImplementedError("Sorry, this is still work in progress.")
- 
+
         # convert to CM coords
         if cm:
             x_prime = x - x.mean(axis=-1).reshape((2,1))
@@ -1280,36 +1280,36 @@ class Rigid3D(Affine):
         xxt = np.dot(x_prime, x_prime.transpose())
         xyt = np.dot(x_prime, y_prime.transpose())
         yxt = np.dot(y_prime, x_prime.transpose())
-        
+
         # function to minimize
         def sq_diff(r, xxt=xxt, xyt=xyt):
             """
             """
-            
+
             r2d = r.reshape((2,3))
             rtr = np.dot(r2d.transpose(), r2d)
 
             # Tr(x * x_t * r_t * r)
             # perhaps (xtx * rtr).sum(), instead?
             term_1 = (
-                np.inner(xxt[0,:], rtr[:,0]) + np.inner(xxt[1,:], rtr[:,1]) + 
-                np.inner(xxt[2,:], rtr[:,2])) 
- 
+                np.inner(xxt[0,:], rtr[:,0]) + np.inner(xxt[1,:], rtr[:,1]) +
+                np.inner(xxt[2,:], rtr[:,2]))
+
             # Tr(x * y_t * r)
             term_2 = (
-                np.inner(xyt[0,:], r2d[:,0]) + np.inner(xyt[1,:], r2d[:,1]) + 
+                np.inner(xyt[0,:], r2d[:,0]) + np.inner(xyt[1,:], r2d[:,1]) +
                 np.inner(xyt[2,:], r2d[:,2]))
 
             res = term_1 - 2 * term_2
-            return res            
-            
+            return res
+
         # derivative of the function to minimize
         def sq_diff_deriv(r, xxt=xxt, yxt=yxt):
             """
             """
 
             r2d = r.reshape((2,3))
- 
+
             # r * x * x_t - 2 * y * x_t
             res2d = np.dot(r2d, xxt) - 2 * yxt
             res = res2d.reshape(6)
@@ -1334,7 +1334,7 @@ class Rigid3D(Affine):
 
         # solve
         res = sp.optimize.minimize(
-            sq_diff, init, jac=sq_diff_deriv, constraints=ortho, 
+            sq_diff, init, jac=sq_diff_deriv, constraints=ortho,
             options={'disp': True})
 
         return res
@@ -1345,7 +1345,7 @@ class Rigid3D(Affine):
         Mode 'r' doesn't work (singular matrix in LSQ)
         """
         raise NotImplementedError("Sorry, this is still work in progress.")
- 
+
         # convert to CM coords
         if cm:
             x_prime = x - x.mean(axis=-1).reshape((2,1))
@@ -1361,16 +1361,16 @@ class Rigid3D(Affine):
         # not necessary, just to have correct min value
         trx2 = (x_prime * x_prime).sum()
         try2 = (y_prime * y_prime).sum()
-        sq_diff_const = trx2 + try2 
-        
+        sq_diff_const = trx2 + try2
+
         # function to minimize
         def sq_diff_cfi_sfi(param, yxt=yxt, const=sq_diff_const):
             """
             """
-        
+
             cfi, sfi = param
             r2d = np.array([[cfi, sfi], [-sfi, cfi]])
-            
+
             # -2 * Tr(x y_t r) = -2 * (y x_t) * r
             res = const - 2 * (yxt * r2d).sum()
             return res
@@ -1380,7 +1380,7 @@ class Rigid3D(Affine):
             """
             """
 
-            # -2 * [Tr(xty), -xyt[0,1] + xyt[1,0]]  
+            # -2 * [Tr(xty), -xyt[0,1] + xyt[1,0]]
             res = np.array([-2 * (xyt[0,0] + xyt[1,1]),
                             -2 * (-xyt[0,1] + xyt[1,0])])
             return res
@@ -1432,17 +1432,17 @@ class Rigid3D(Affine):
                 init = np.array([1, 0.])
 
             res = sp.optimize.minimize(
-                sq_diff_cfi_sfi, init, jac=sq_diff_cfi_sfi_deriv, 
+                sq_diff_cfi_sfi, init, jac=sq_diff_cfi_sfi_deriv,
                 constraints=cons_cfi_sfi, options={'disp': True})
 
         elif mode == 'r':
-            
+
             # init
             if init is None:
                 init = np.array([1, 0., 0, 1])
 
             res = sp.optimize.minimize(
-                sq_diff_r, init, jac=sq_diff_r_deriv, 
+                sq_diff_r, init, jac=sq_diff_r_deriv,
                 constraints=cons_r, options={'disp': True})
 
         return res
@@ -1454,7 +1454,7 @@ class Rigid3D(Affine):
         Doesn't always work
         """
         raise NotImplementedError("Sorry, this is still work in progress.")
- 
+
         # convert to CM coords
         if cm:
             x_prime = x - x.mean(axis=-1).reshape((3,1))
@@ -1470,8 +1470,8 @@ class Rigid3D(Affine):
         # not necessary, just to have correct min value
         trxx = (x_prime * x_prime).sum()
         #try2 = (y_prime * y_prime).sum()
-        #sq_diff_const = trx2 + try2 
-        
+        #sq_diff_const = trx2 + try2
+
         # function to minimize
         def sq_diff_ck_33(
                 param, x=x_prime, y=y_prime, make_r=cls.make_r_ck, const=trxx):
@@ -1497,12 +1497,12 @@ class Rigid3D(Affine):
 
             # Tr(x_t x + y_t y - 2 x y_t r)
             yxt = np.dot(y_3n, x_prime.transpose())
-            res = const + (y_3n * y_3n).sum() - 2 * (yxt * r).sum() 
+            res = const + (y_3n * y_3n).sum() - 2 * (yxt * r).sum()
 
             return res
 
         def sq_diff_ck_33_deriv(
-                param, x=x_prime, y=y_prime, make_r=cls.make_r_ck, 
+                param, x=x_prime, y=y_prime, make_r=cls.make_r_ck,
                 make_r_deriv=cls.make_r_ck_deriv):
             """
             """
@@ -1537,7 +1537,7 @@ class Rigid3D(Affine):
             #dr_de3 = np.array(
             #    [[-e3, e0, e1], [-e0, -e3, e2], [e1, e2, e3]])
             dr_de0, dr_de1, dr_de2, dr_de3 = make_r_deriv([e0, e1, e2, e3])
-            
+
             # d / de
             d_de0 = -2 * (yxt * dr_de0).sum()
             d_de1 = -2 * (yxt * dr_de1).sum()
@@ -1549,7 +1549,7 @@ class Rigid3D(Affine):
             d_dy3 = 2 * (y_3n[2,:] - rx3)
 
             # together
-            res = np.hstack(([d_de0, d_de1, d_de2, d_de3], d_dy3)) 
+            res = np.hstack(([d_de0, d_de1, d_de2, d_de3], d_dy3))
             return res
 
         # constraint e**2 = 1
@@ -1575,14 +1575,14 @@ class Rigid3D(Affine):
               'jac' : partial(constr_jac, i=2)},
             {'type' : 'ineq',
              'fun' : lambda par: np.array(1 - par[3]),
-             'jac' : partial(constr_jac, i=3)}             
+             'jac' : partial(constr_jac, i=3)}
             )
 
         # init: [1, 0, 0, ...]
         if init is None:
             init = np.zeros(4 + y_prime.shape[1])
             init[0] = 1.
-          
+
         # jacobian
         if use_jac:
             jac = sq_diff_ck_33_deriv
@@ -1591,7 +1591,7 @@ class Rigid3D(Affine):
 
         # solve
         res = sp.optimize.minimize(
-            sq_diff_ck_33, init, jac=jac, constraints=constr_ck_norm, 
+            sq_diff_ck_33, init, jac=jac, constraints=constr_ck_norm,
             options={'disp': True, 'maxiter' : maxiter})
 
         return res

@@ -33,11 +33,11 @@ import numpy as np
 from scipy.optimize import curve_fit, leastsq
 import matplotlib.pyplot as plt
 import tifffile as tf
-import parabolic
+from . import parabolic
 
 try:
-	import clrmsg
-	import TDCT_debug
+	from . import clrmsg
+	from . import TDCT_debug
 except:
 	pass
 
@@ -54,7 +54,7 @@ def getzPoly(x,y,img,n=None,optimize=False):
 	!! if optimize is True, 3 values are returned: x,y,z"""
 
 	if not isinstance(img, str) and not isinstance(img, np.ndarray):
-		if clrmsg and debug is True: print clrmsg.ERROR
+		if clrmsg and debug is True: print(clrmsg.ERROR)
 		raise TypeError('I can only handle an image path as string or an image volume as numpy.ndarray imported from tifffile.py')
 	elif isinstance(img, str):
 		img = tf.imread(img)
@@ -67,8 +67,8 @@ def getzPoly(x,y,img,n=None,optimize=False):
 	data_z_xp_poly, data_z_yp_poly = parabolic.parabolic_polyfit(data_z, np.argmax(data_z), n)
 
 	if math.isnan(data_z_xp_poly):
-		if clrmsg and debug is True: print clrmsg.ERROR
-		print TypeError('Failed: Probably due to low SNR')
+		if clrmsg and debug is True: print(clrmsg.ERROR)
+		print(TypeError('Failed: Probably due to low SNR'))
 		if optimize is True:
 			return x,y,'failed'
 		else:
@@ -76,7 +76,7 @@ def getzPoly(x,y,img,n=None,optimize=False):
 
 	if debug is True:
 		f, ax = plt.subplots()
-		ax.plot(range(0,len(data_z)), data_z, color='blue')
+		ax.plot(list(range(0,len(data_z))), data_z, color='blue')
 		ax.plot(data_z_xp_poly, data_z_yp_poly, 'o', color='black')
 		ax.set_title("mid: "+str(data_z_xp_poly))
 
@@ -99,7 +99,7 @@ def getzGauss(x,y,img,parent=None,optimize=False,threshold=None,threshVal=0.6,cu
 	cutout specifies the FOV for the 2D Gaussian fit"""
 
 	if not isinstance(img, str) and not isinstance(img, np.ndarray):
-		if clrmsg and debug is True: print clrmsg.ERROR
+		if clrmsg and debug is True: print(clrmsg.ERROR)
 		raise TypeError('I can only handle an image path as string or an image volume as numpy.ndarray imported from tifffile.py')
 	elif isinstance(img, str):
 		img = tf.imread(img)
@@ -112,7 +112,7 @@ def getzGauss(x,y,img,parent=None,optimize=False,threshold=None,threshVal=0.6,cu
 		return poptZ[1]
 	else:
 		repeats = 5
-		if clrmsg and debug is True: print clrmsg.DEBUG + '2D Gaussian xy optimization running %.f at z = %.f' % (repeats,round(poptZ[1]))
+		if clrmsg and debug is True: print(clrmsg.DEBUG + '2D Gaussian xy optimization running %.f at z = %.f' % (repeats,round(poptZ[1])))
 		for repeat in range(repeats):
 			data = np.copy(img[
 						round(poptZ[1]),
@@ -153,13 +153,13 @@ def optimize_z(x,y,z,image,n=None):
 	x_opt,y_opt,z_opt = x,y,z
 	for i in range(5):
 		try:
-			print x_opt,y_opt,z_opt
+			print(x_opt,y_opt,z_opt)
 			x_opt,y_opt,z_opt = int(round(x_opt)),int(round(y_opt)),int(round(z_opt))
 			x_opt, y_opt = optimize_xy(x_opt,y_opt,z_opt,img,nx=None,ny=None)
 			data_z = img[:,round(y_opt),round(x_opt)]
 		except Exception as e:
-			if clrmsg and debug is True: print clrmsg.ERROR
-			print IndexError("Optimization failed, possibly due to low signal or low SNR. "+str(e))
+			if clrmsg and debug is True: print(clrmsg.ERROR)
+			print(IndexError("Optimization failed, possibly due to low signal or low SNR. "+str(e)))
 			return [x],[y],['failed']
 		n = getn(data_z)
 		z_opt, data_z_yp_poly = parabolic.parabolic_polyfit(data_z, np.argmax(data_z), n)
@@ -208,8 +208,8 @@ def optimize_xy(x,y,z,image,nx=None,ny=None):
 	for offset in range(10):
 		data_x = img[z,y-offset,x-samplewidth:x+samplewidth]
 		if data_x.max() < data_x.mean()*1.1:
-			# print "breaking at ",offset
-			# print data_x.max(), data_x.mean(), data_x.mean()*1.1
+			# print("breaking at ", offset)
+			# print(data_x.max(), data_x.mean(), data_x.mean() * 1.1)
 			break
 		if get_nx is True:
 			nx = getn(data_x)
@@ -217,13 +217,13 @@ def optimize_xy(x,y,z,image,nx=None,ny=None):
 		xmaxvals = np.append(xmaxvals,[data_x_xp_poly])
 		c = np.random.rand(3,1)
 		if debug is True:
-			axarr[0].plot(range(0,len(data_x)), data_x, color=c)
+			axarr[0].plot(list(range(0,len(data_x))), data_x, color=c)
 			axarr[0].plot(data_x_xp_poly, data_x_yp_poly, 'o', color=c)
 	for offset in range(10):
 		data_x = img[z,y+offset,x-samplewidth:x+samplewidth]
 		if data_x.max() < data_x.mean()*1.1:
-			# print "breaking at ",offset
-			# print data_x.max(), data_x.mean(), data_x.mean()*1.1
+			# print("breaking at ", offset)
+			# print(data_x.max(), data_x.mean(), data_x.mean() * 1.1)
 			break
 		if get_nx is True:
 			nx = getn(data_x)
@@ -231,7 +231,7 @@ def optimize_xy(x,y,z,image,nx=None,ny=None):
 		xmaxvals = np.append(xmaxvals,[data_x_xp_poly])
 		c = np.random.rand(3,1)
 		if debug is True:
-			axarr[0].plot(range(0,len(data_x)), data_x, color=c)
+			axarr[0].plot(list(range(0,len(data_x))), data_x, color=c)
 			axarr[0].plot(data_x_xp_poly, data_x_yp_poly, 'o', color=c)
 
 	if debug is True: axarr[0].set_title("mid-mean: "+str(xmaxvals.mean()))
@@ -241,8 +241,8 @@ def optimize_xy(x,y,z,image,nx=None,ny=None):
 	for offset in range(10):
 		data_y = img[z,y-samplewidth:y+samplewidth,x-offset]
 		if data_y.max() < data_y.mean()*1.1:
-			# print "breaking at ",offset
-			# print data_y.max(), data_y.mean(), data_y.mean()*1.1
+			# print("breaking at ", offset)
+			# print(data_y.max(), data_y.mean(), data_y.mean() * 1.1)
 			break
 		if get_ny is True:
 			ny = getn(data_y)
@@ -250,14 +250,14 @@ def optimize_xy(x,y,z,image,nx=None,ny=None):
 		ymaxvals = np.append(ymaxvals,[data_y_xp_poly])
 		c = np.random.rand(3,1)
 		if debug is True:
-			axarr[1].plot(range(0,len(data_y)), data_y, color=c)
+			axarr[1].plot(list(range(0,len(data_y))), data_y, color=c)
 			axarr[1].plot(data_y_xp_poly, data_y_yp_poly, 'o', color=c)
 
 	for offset in range(10):
 		data_y = img[z,y-samplewidth:y+samplewidth,x+offset]
 		if data_y.max() < data_y.mean()*1.1:
-			# print "breaking at ",offset
-			# print data_y.max(), data_y.mean(), data_y.mean()*1.1
+			# print("breaking at ", offset)
+			# print(data_y.max(), data_y.mean(), data_y.mean() * 1.1)
 			break
 		if get_ny is True:
 			ny = getn(data_y)
@@ -265,7 +265,7 @@ def optimize_xy(x,y,z,image,nx=None,ny=None):
 		ymaxvals = np.append(ymaxvals,[data_y_xp_poly])
 		c = np.random.rand(3,1)
 		if debug is True:
-			axarr[1].plot(range(0,len(data_y)), data_y, color=c)
+			axarr[1].plot(list(range(0,len(data_y))), data_y, color=c)
 			axarr[1].plot(data_y_xp_poly, data_y_yp_poly, 'o', color=c)
 
 	if debug is True: axarr[1].set_title("mid-mean: "+str(ymaxvals.mean()))
@@ -313,16 +313,16 @@ def gaussfit(data,parent=None,hold=False):
 		from scipy.stats import ks_2samp
 		## Get std from the diagonal of the covariance matrix
 		std_height, std_mean, std_sigma = np.sqrt(np.diag(pcov))
-		print clrmsg.DEBUG + '='*15, 'GAUSS FIT', '='*25
-		print clrmsg.DEBUG + 'Amplitude		:', popt[0]
-		print clrmsg.DEBUG + 'Location		:', popt[1]
+		print(clrmsg.DEBUG + '='*15, 'GAUSS FIT', '='*25)
+		print(clrmsg.DEBUG + 'Amplitude		:', popt[0])
+		print(clrmsg.DEBUG + 'Location		:', popt[1])
 		## http://mathworld.wolfram.com/GaussianFunction.html -> sigma * 2 * sqrt(2 * ln(2))
-		print clrmsg.DEBUG + 'FWHM			:', popt[2] * 2 * math.sqrt(2 * math.log(2,math.e))
-		print clrmsg.DEBUG + 'Std. Amplitude	:', std_height
-		print clrmsg.DEBUG + 'Std. Location	:', std_mean
-		print clrmsg.DEBUG + 'Std. FWHM		:', std_sigma * 2 * math.sqrt(2 * math.log(2,math.e))
-		print clrmsg.DEBUG + 'Mean dy		:', np.absolute(y-data[1]).mean()
-		print clrmsg.DEBUG + str(ks_2samp(y, data[1]))
+		print(clrmsg.DEBUG + 'FWHM			:', popt[2] * 2 * math.sqrt(2 * math.log(2,math.e)))
+		print(clrmsg.DEBUG + 'Std. Amplitude	:', std_height)
+		print(clrmsg.DEBUG + 'Std. Location	:', std_mean)
+		print(clrmsg.DEBUG + 'Std. FWHM		:', std_sigma * 2 * math.sqrt(2 * math.log(2,math.e)))
+		print(clrmsg.DEBUG + 'Mean dy		:', np.absolute(y-data[1]).mean())
+		print(clrmsg.DEBUG + str(ks_2samp(y, data[1])))
 	return popt, pcov
 
 
@@ -405,8 +405,8 @@ def fitgaussian(data,parent=None):
 # 	plt.show()
 # 	if clrmsg and debug is True:
 # 		from scipy.stats import ks_2samp
-# 		print clrmsg.DEBUG + ('Mean dy : %.6f' % np.absolute(y-data[1]).mean())
-# 		print clrmsg.DEBUG + str(ks_2samp(y, data[1]))
+# 		print(clrmsg.DEBUG + ('Mean dy : %.6f' % np.absolute(y-data[1]).mean()))
+# 		print(clrmsg.DEBUG + str(ks_2samp(y, data[1])))
 
 
 # def test2Dgauss(data=None):
@@ -417,7 +417,7 @@ def fitgaussian(data,parent=None):
 # 		data = gaussian(3, 100, 100, 20, 40)(Xin, Yin) + np.random.random(Xin.shape)
 
 # 	# data = data-data.min()
-# 	print data.min(), data.max()
+# 	print(data.min(), data.max())
 # 	threshold = data < data.max()-(data.max()-data.min())*0.6
 # 	data[threshold] = 0
 
@@ -441,5 +441,5 @@ def fitgaussian(data,parent=None):
 # 	show()
 
 # img = tf.imread('/Users/jan/Desktop/dot2.tif')
-# print img.shape
+# print(img.shape)
 # test2Dgauss(img)

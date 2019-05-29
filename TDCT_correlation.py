@@ -54,12 +54,12 @@ Ui_WidgetWindow, QtBaseClass = uic.loadUiType(qtCreatorFile_main)
 
 debug = TDCT_debug.debug
 # debug = True
-if debug is True: print clrmsg.DEBUG + "Execdir =", execdir
+if debug is True: print(clrmsg.DEBUG + "Execdir =", execdir)
 
 
 class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
     def __init__(self, parent=None, leftImage=None, rightImage=None, workingdir=None):
-        if debug is True: print clrmsg.DEBUG + 'Debug messages enabled'
+        if debug is True: print(clrmsg.DEBUG + 'Debug messages enabled')
         QtGui.QWidget.__init__(self)
         Ui_WidgetWindow.__init__(self)
         self.setupUi(self)
@@ -242,13 +242,13 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
         """
         if event.key() == QtCore.Qt.Key_Delete:
             if self.currentFocusedWidgetName == 'tableView_left':
-                if debug is True: print clrmsg.DEBUG + "Deleting item(s) on the left side"
+                if debug is True: print(clrmsg.DEBUG + "Deleting item(s) on the left side")
                 # self.deleteItem(self.tableView_left,self.modelLleft,self.sceneLeft)
                 self.tableView_left.deleteItem()
                 # self.updateItems(self.modelLleft,self.sceneLeft)
                 self.tableView_left.updateItems()
             elif self.currentFocusedWidgetName == 'tableView_right':
-                if debug is True: print clrmsg.DEBUG + "Deleting item(s) on the right side"
+                if debug is True: print(clrmsg.DEBUG + "Deleting item(s) on the right side")
                 # self.deleteItem(self.tableView_right,self.modelRight,self.sceneRight)
                 self.tableView_right.deleteItem()
                 # self.updateItems(self.modelRight,self.sceneRight)
@@ -283,10 +283,10 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
             if workingdir:
                 self.workingdir = workingdir
             self.lineEdit_workingDir.setText(self.workingdir)
-            print 'updated working dir to:', self.workingdir
+            print('updated working dir to:', self.workingdir)
         else:
             self.lineEdit_workingDir.setText(self.workingdir)
-            print clrmsg.ERROR + "Dropped object is not a valid path. Returning to {0} as working directory.".format(self.workingdir)
+            print(clrmsg.ERROR + "Dropped object is not a valid path. Returning to {0} as working directory.".format(self.workingdir))
 
     def checkWorkingDirPrivileges(self,path):
         try:
@@ -300,8 +300,8 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
             return None
 
     def changedFocusSlot(self, former, current):
-        if debug is True: print clrmsg.DEBUG + "focus changed from/to:", former.objectName() if former else former, \
-                current.objectName() if current else current
+        if debug is True: print(clrmsg.DEBUG + "focus changed from/to:", former.objectName() if former else former, \
+                current.objectName() if current else current)
         if current:
             self.currentFocusedWidgetName = current.objectName()
             self.currentFocusedWidget = current
@@ -557,14 +557,14 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
                     self.modelLleft.item(row, 1).setBackground(QtGui.QColor(*color_correlate))
                     self.modelLleft.item(row, 2).setBackground(QtGui.QColor(*color_correlate))
                 except:
-                    if debug is True: print clrmsg.DEBUG + "Model item is None"
+                    if debug is True: print(clrmsg.DEBUG + "Model item is None")
             if rowsRight != 0:
                 try:
                     self.modelRight.item(row, 0).setBackground(QtGui.QColor(*color_correlate))
                     self.modelRight.item(row, 1).setBackground(QtGui.QColor(*color_correlate))
                     self.modelRight.item(row, 2).setBackground(QtGui.QColor(*color_correlate))
                 except:
-                    if debug is True: print clrmsg.DEBUG + "Model item is None"
+                    if debug is True: print(clrmsg.DEBUG + "Model item is None")
         if rowsLeft > rowsRight:
             if '{0:b}'.format(self.sceneLeft.imagetype)[-1] == '0' or '{0:b}'.format(
                                                 self.sceneLeft.imagetype)[-1] == '{0:b}'.format(self.sceneRight.imagetype)[-1]:
@@ -577,7 +577,7 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
                     self.modelLleft.item(row, 1).setBackground(QtGui.QColor(*color_overflow))
                     self.modelLleft.item(row, 2).setBackground(QtGui.QColor(*color_overflow))
                 except:
-                    if debug is True: print clrmsg.DEBUG + "Model item is None"
+                    if debug is True: print(clrmsg.DEBUG + "Model item is None")
         elif rowsLeft < rowsRight:
             if '{0:b}'.format(self.sceneRight.imagetype)[-1] == '0' or '{0:b}'.format(
                                                 self.sceneLeft.imagetype)[-1] == '{0:b}'.format(self.sceneRight.imagetype)[-1]:
@@ -590,7 +590,7 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
                     self.modelRight.item(row, 1).setBackground(QtGui.QColor(*color_overflow))
                     self.modelRight.item(row, 2).setBackground(QtGui.QColor(*color_overflow))
                 except:
-                    if debug is True: print clrmsg.DEBUG + "Model item is None"
+                    if debug is True: print(clrmsg.DEBUG + "Model item is None")
 
     def getMarkerColor(self):
         color = QtGui.QColorDialog.getColor()
@@ -625,7 +625,7 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
             try:
                 splashscreen.splash.showMessage("Loading images... "+self.leftImage,color=QtCore.Qt.white)
             except Exception as e:
-                print clrmsg.WARNING, e
+                print(clrmsg.WARNING, e)
                 pass
             QtGui.QApplication.processEvents()
             ## Get pixel size
@@ -671,7 +671,7 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
             try:
                 splashscreen.splash.showMessage("Loading images... "+self.rightImage,color=QtCore.Qt.white)
             except Exception as e:
-                print clrmsg.WARNING, e
+                print(clrmsg.WARNING, e)
                 pass
             QtGui.QApplication.processEvents()
             ## Get pixel size
@@ -811,7 +811,7 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
             self.contrast_left_layer1 = 10
             self.horizontalSlider_brightness.setValue(0)
             self.horizontalSlider_contrast.setValue(10)
-        # print img.shape
+        # print(img.shape)
         ## Reset Overlay
         self.img_left_overlay = None
         ## Load original
@@ -837,7 +837,7 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
             self.contrast_right_layer1 = 10
             self.horizontalSlider_brightness.setValue(0)
             self.horizontalSlider_contrast.setValue(10)
-        # print img.shape
+        # print(img.shape)
         ## Reset Overlay
         self.img_right_overlay = None
         ## Load original
@@ -870,7 +870,7 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
 
     def rotateImage45(self,direction=None):
         if direction is None:
-            print clrmsg.ERROR + "Please specify direction ('cw' or 'ccw')."
+            print(clrmsg.ERROR + "Please specify direction ('cw' or 'ccw').")
         # rotate 45 degree clockwise
         elif direction == 'cw':
             if self.label_selimg.text() == 'left':
@@ -902,7 +902,7 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
 
     def anglectrl(self,angle=None):
         if angle is None:
-            print clrmsg.ERROR + "Please specify side, e.g. anglectrl(angle=self.sceneLeft.rotangle)"
+            print(clrmsg.ERROR + "Please specify side, e.g. anglectrl(angle=self.sceneLeft.rotangle)")
         elif angle >= 360:
             angle -= 360
         elif angle < 0:
@@ -915,12 +915,12 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
             ## Update graphics
             self.sceneLeft.enumeratePoints()
             if self.sceneLeft.pixelSize:
-                if debug is True: print clrmsg.DEBUG + "Doing stuff with image pixelSize (left image).", self.label_imgpxsize.text()
+                if debug is True: print(clrmsg.DEBUG + "Doing stuff with image pixelSize (left image).", self.label_imgpxsize.text())
                 try:
                     self.label_markerSizeNano.setText(str(self.sceneLeft.markerSize*2*self.sceneLeft.pixelSize))
                     self.label_markerSizeNanoUnit.setText(self.sceneLeft.pixelSizeUnit)
                 except:
-                    if debug is True: print clrmsg.DEBUG + "Image pixel size is not a number:", self.label_imgpxsize.text()
+                    if debug is True: print(clrmsg.DEBUG + "Image pixel size is not a number:", self.label_imgpxsize.text())
                     self.label_markerSizeNano.setText("NaN")
                     self.label_markerSizeNanoUnit.setText('')
             else:
@@ -931,12 +931,12 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
             ## Update graphics
             self.sceneRight.enumeratePoints()
             if self.sceneRight.pixelSize:
-                if debug is True: print clrmsg.DEBUG + "Doing stuff with image pixelSize (right image).", self.label_imgpxsize.text()
+                if debug is True: print(clrmsg.DEBUG + "Doing stuff with image pixelSize (right image).", self.label_imgpxsize.text())
                 try:
                     self.label_markerSizeNano.setText(str(self.sceneRight.markerSize*2*self.sceneRight.pixelSize))
                     self.label_markerSizeNanoUnit.setText(self.sceneRight.pixelSizeUnit)
                 except:
-                    if debug is True: print clrmsg.DEBUG + "Image pixel size is not a number:", self.label_imgpxsize.text()
+                    if debug is True: print(clrmsg.DEBUG + "Image pixel size is not a number:", self.label_imgpxsize.text())
                     self.label_markerSizeNano.setText("NaN")
                     self.label_markerSizeNanoUnit.setText('')
             else:
@@ -970,22 +970,22 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
             8 = multicolor/multichannel
             16= normalized
         """
-        if debug is True: print clrmsg.DEBUG + "===== imread"
+        if debug is True: print(clrmsg.DEBUG + "===== imread")
         img = tf.imread(path)
-        if debug is True: print clrmsg.DEBUG + "Image shape/dtype:", img.shape, img.dtype
+        if debug is True: print(clrmsg.DEBUG + "Image shape/dtype:", img.shape, img.dtype)
         ## Displaying issues with uint16 images -> convert to uint8
         if img.dtype == 'uint16':
             img = img*(255.0/img.max())
             img = img.astype(dtype=np.uint8)
-            if debug is True: print clrmsg.DEBUG + "Image dtype converted to:", img.shape, img.dtype
+            if debug is True: print(clrmsg.DEBUG + "Image dtype converted to:", img.shape, img.dtype)
         if img.ndim == 4:
-            if debug is True: print clrmsg.DEBUG + "Calculating multichannel MIP"
+            if debug is True: print(clrmsg.DEBUG + "Calculating multichannel MIP")
             ## return MIP, code 2+8+16 and image stack
             return np.amax(img, axis=1), 26, img
         ## this can only handle rgb. For more channels set "3" to whatever max number of channels should be handled
         elif img.ndim == 3 and any([True for dim in img.shape if dim <= 4]) or img.ndim == 2:
-            if debug is True: print clrmsg.DEBUG + "Loading regular 2D image... multicolor/normalize:", \
-                [True for x in [img.ndim] if img.ndim == 3],'/',[normalize]
+            if debug is True: print(clrmsg.DEBUG + "Loading regular 2D image... multicolor/normalize:", \
+                [True for x in [img.ndim] if img.ndim == 3],'/',[normalize])
             if normalize is True:
                 ## return normalized 2D image with code 1+4+16 for gray scale normalized 2D image and 1+8+16 for
                 ## multicolor normalized 2D image
@@ -994,14 +994,14 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
                 ## return 2D image with code 1+4 for gray scale 2D image and 1+8 for multicolor 2D image
                 return img, 9 if img.ndim == 3 else 5, None
         elif img.ndim == 3:
-            if debug is True: print clrmsg.DEBUG + "Calculating MIP"
+            if debug is True: print(clrmsg.DEBUG + "Calculating MIP")
             ## return MIP and code 2+4+1E6
             return np.amax(img, axis=0), 22, img
 
     def pxSize(self,img_path,z=False):
         with tf.TiffFile(img_path) as tif:
             for page in tif:
-                for tag in page.tags.values():
+                for tag in list(page.tags.values()):
                     if isinstance(tag.value, str):
                         for keyword in ['PhysicalSizeX','PixelWidth','PixelSize'] if not z else ['PhysicalSizeZ','FocusStepSize']:
                             tagposs = [m.start() for m in re.finditer(keyword, tag.value)]
@@ -1010,13 +1010,13 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
                                     for piece in tag.value[tagpos:tagpos+30].split('"'):
                                         try:
                                             pixelSize = float(piece)
-                                            if debug is True: print clrmsg.DEBUG + "Pixel size from exif metakey:", keyword
+                                            if debug is True: print(clrmsg.DEBUG + "Pixel size from exif metakey:", keyword)
                                             ## Value is in um from CorrSight/LA tiff files
                                             if z:
                                                 pixelSize = pixelSize*1000
                                             return pixelSize
                                         except Exception as e:
-                                            if debug is True: print clrmsg.DEBUG + "Pixel size parser:", e
+                                            if debug is True: print(clrmsg.DEBUG + "Pixel size parser:", e)
                                             pass
                                 elif keyword == 'PixelWidth':
                                     for piece in tag.value[tagpos:tagpos+30].split('='):
@@ -1025,30 +1025,30 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
                                                 pixelSize = float(piece.strip().split('\r\n')[0])
                                             except:
                                                 pixelSize = float(piece.strip().split(r'\r\n')[0])
-                                            if debug is True: print clrmsg.DEBUG + "Pixel size from exif metakey:", keyword
+                                            if debug is True: print(clrmsg.DEBUG + "Pixel size from exif metakey:", keyword)
                                             ## *1E6 because these values from SEM/FIB image is in m
                                             return pixelSize*1E6
                                         except Exception as e:
-                                            if debug is True: print clrmsg.DEBUG + "Pixel size parser:", e
+                                            if debug is True: print(clrmsg.DEBUG + "Pixel size parser:", e)
                                             pass
                                 elif keyword == 'PixelSize' or 'FocusStepSize':
                                     for piece in tag.value[tagpos:tagpos+30].split('"'):
                                         try:
                                             pixelSize = float(piece)
-                                            if debug is True: print clrmsg.DEBUG + "Pixel size from exif metakey:", keyword
+                                            if debug is True: print(clrmsg.DEBUG + "Pixel size from exif metakey:", keyword)
                                             ## Value is in um from CorrSight/LA tiff files
                                             return pixelSize
                                         except Exception as e:
-                                            if debug is True: print clrmsg.DEBUG + "Pixel size parser:", e
+                                            if debug is True: print(clrmsg.DEBUG + "Pixel size parser:", e)
                                             pass
 
     ## Convert opencv image (numpy array in BGR) to RGB QImage and return pixmap. Only takes 2D images
     def cv2Qimage(self,img,combobox=None):
-        if debug is True: print clrmsg.DEBUG + "===== cv2Qimage"
+        if debug is True: print(clrmsg.DEBUG + "===== cv2Qimage")
         if img.shape[0] <= 4:
-            if debug is True: print clrmsg.DEBUG + "Swapping image axes from c,y,x to y,x,c."
+            if debug is True: print(clrmsg.DEBUG + "Swapping image axes from c,y,x to y,x,c.")
             img = img.swapaxes(0,2).swapaxes(0,1)
-        if debug is True: print clrmsg.DEBUG + "Image shape:", img.shape
+        if debug is True: print(clrmsg.DEBUG + "Image shape:", img.shape)
 
         return QtGui.QPixmap.fromImage(qimage2ndarray.array2qimage(img))
 
@@ -1091,7 +1091,7 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
     ## Adjust Brightness and Contrast by sliders
     def adjustBrightCont(self,img_displayed,img_adjusted,brightness,contrast):
         if debug is True: ping = time.time()
-        if debug is True: print clrmsg.DEBUG + "===== adjustBrightCont"
+        if debug is True: print(clrmsg.DEBUG + "===== adjustBrightCont")
         ## Load replacement
         img_adjusted = np.copy(img_displayed)
         ## Load contrast value (Slider value between 0 and 100)
@@ -1108,12 +1108,12 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
             ## Convert from int16 back to uint8
             img_adjusted = img_adjusted.astype(dtype=np.uint8)
         if debug is True: pong = time.time()
-        if debug is True: print clrmsg.DEBUG + 'adjusting brightness/contrast in s:', pong-ping
+        if debug is True: print(clrmsg.DEBUG + 'adjusting brightness/contrast in s:', pong-ping)
         return img_adjusted
 
     ## Normalize Image
     def norm_img(self,img,copy=False):
-        if debug is True: print clrmsg.DEBUG + "===== norm_img"
+        if debug is True: print(clrmsg.DEBUG + "===== norm_img")
         if copy is True:
             img = np.copy(img)
         dtype = str(img.dtype)
@@ -1125,18 +1125,18 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
         elif dtype == "float32" or dtype == "float64":
             typesize = 1
         else:
-            print clrmsg.ERROR + "Sorry, I don't know this file type yet: ", dtype
+            print(clrmsg.ERROR + "Sorry, I don't know this file type yet: ", dtype)
         ## 2D image
         if img.ndim == 2: img *= typesize/img.max()
         ## 3D or multichannel image
         elif img.ndim == 3:
             ## tifffile reads z,y,x for stacks but y,x,c if it is multichannel image (or z,c,y,x if it is a multicolor image stack)
             if img.shape[-1] > 4:
-                if debug is True: print clrmsg.DEBUG + "image stack"
+                if debug is True: print(clrmsg.DEBUG + "image stack")
                 for i in range(int(img.shape[0])):
                     img[i,:,:] *= typesize/img[i,:,:].max()
             else:
-                if debug is True: print clrmsg.DEBUG + "multichannel image"
+                if debug is True: print(clrmsg.DEBUG + "multichannel image")
                 for i in range(int(img.shape[2])):
                     img[:,:,i] *= typesize/img[:,:,i].max()
         return img
@@ -1244,7 +1244,7 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
                                                                 self.comboBox_channelColorLayer2.currentText(),
                                                                 self.comboBox_channelColorLayer3.currentText()]):
             if debug is True: pong = time.time()
-            if debug is True: print clrmsg.DEBUG + 'colorize image in s:', pong-ping
+            if debug is True: print(clrmsg.DEBUG + 'colorize image in s:', pong-ping)
             return img
         elif color is None:
             color = [255,255,255]
@@ -1256,7 +1256,7 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
         imgC[:,:,1] = img*(color[1]/255.0)
         imgC[:,:,2] = img*(color[2]/255.0)
         if debug is True: pong = time.time()
-        if debug is True: print clrmsg.DEBUG + 'colorize image in s:', pong-ping
+        if debug is True: print(clrmsg.DEBUG + 'colorize image in s:', pong-ping)
         return imgC.astype(dtype=np.uint8)
 
     def colorCoder(self,code,side,layer):
@@ -1317,7 +1317,7 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
             self.pixmap_left = self.cv2Qimage(img_blend)
             self.pixmap_item_left = QtGui.QGraphicsPixmapItem(self.pixmap_left, None, self.sceneLeft)
             ## Put exchanged image into background
-            QtGui.QGraphicsItem.stackBefore(self.pixmap_item_left, self.sceneLeft.items()[-1])
+            QtGui.QGraphicsItem.stackBefore(self.pixmap_item_left, list(self.sceneLeft.items())[-1])
             ## fix bug, where markers vanished behind image, by setting z value low enough
             self.pixmap_item_left.setZValue(-10)
         elif side == 'right':
@@ -1338,14 +1338,14 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
             self.pixmap_right = self.cv2Qimage(img_blend)
             self.pixmap_item_right = QtGui.QGraphicsPixmapItem(self.pixmap_right, None, self.sceneRight)
             ## Put exchanged image into background
-            QtGui.QGraphicsItem.stackBefore(self.pixmap_item_right, self.sceneRight.items()[-1])
+            QtGui.QGraphicsItem.stackBefore(self.pixmap_item_right, list(self.sceneRight.items())[-1])
             ## fix bug, where markers vanished behind image, by setting z value low enough
             self.pixmap_item_right.setZValue(-10)
         if save is True:
             timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
             cv2.imwrite(os.path.join(self.workingdir,timestamp+"_image.tif"), cv2.cvtColor(img_blend,cv2.COLOR_RGB2BGR))
         if debug is True: pong = time.time()
-        if debug is True: print clrmsg.DEBUG + 'displaying image in s:', pong-ping
+        if debug is True: print(clrmsg.DEBUG + 'displaying image in s:', pong-ping)
 
     def blendImages(self,images,blendmode='screen'):
         """
@@ -1367,7 +1367,7 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
                     elif blendmode == 'minimum':
                         blend = np.minimum(blend,images[i])
             if debug is True: pong = time.time()
-            if debug is True: print clrmsg.DEBUG + 'blending images in s:', pong-ping
+            if debug is True: print(clrmsg.DEBUG + 'blending images in s:', pong-ping)
             return blend.astype(dtype=np.uint8)
 
     def layerCtrl(self,layer,load=False):
@@ -1714,7 +1714,7 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
                 img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
         else:
             def corrMsgBox(self,msg):
-                print 'message box'
+                print('message box')
                 msgBox = QtGui.QMessageBox()
                 msgBox.setIcon(QtGui.QMessageBox.Question)
                 msgBox.setText(msg)
@@ -2012,8 +2012,8 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
             tableView1.clearSelection()
             tableView2.clearSelection()
         if doubleclick is True:
-            if debug is True: print clrmsg.DEBUG + 'double click'
-            if debug is True: print clrmsg.DEBUG, graphicsView.transform().m11(), graphicsView.transform().m22()
+            if debug is True: print(clrmsg.DEBUG + 'double click')
+            if debug is True: print(clrmsg.DEBUG, graphicsView.transform().m11(), graphicsView.transform().m22())
             graphicsView.setTransform(QtGui.QTransform(
                 20,  # m11
                 graphicsView.transform().m12(),
@@ -2025,7 +2025,7 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
                 graphicsView.transform().m32(),
                 graphicsView.transform().m33(),
                 ))
-            if debug is True: print clrmsg.DEBUG, graphicsView.transform().m11(), graphicsView.transform().m22()
+            if debug is True: print(clrmsg.DEBUG, graphicsView.transform().m11(), graphicsView.transform().m22())
             ## Center on coordinate
             graphicsView.centerOn(
                 float(tableView1._model.data(tableView1._model.index(markerNr, 0)).toString()),
@@ -2055,7 +2055,7 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
             tableView = self.tableView_right
             scene = self.sceneRight
         items = []
-        for item in scene.items():
+        for item in list(scene.items()):
             if isinstance(item, QtGui.QGraphicsEllipseItem):
                 items.append(item)
         if indices:
@@ -2064,9 +2064,9 @@ class MainWidget(QtGui.QMainWindow, Ui_WidgetWindow):
             ## Select rows (only one row selectable in the results table)
             for row in rows:
                 markerNr = int(self.modelResultsProxy.data(self.modelResultsProxy.index(row, 0)).toString())-1
-                if debug is True: print clrmsg.DEBUG + 'Marker number/background color (Qrgba)', markerNr, \
+                if debug is True: print(clrmsg.DEBUG + 'Marker number/background color (Qrgba)', markerNr, \
                     self.modelResults.itemFromIndex(
-                        self.modelResultsProxy.mapToSource((self.modelResultsProxy.index(row, 0)))).background().color().rgba()
+                        self.modelResultsProxy.mapToSource((self.modelResultsProxy.index(row, 0)))).background().color().rgba())
                 if self.modelResults.itemFromIndex(self.modelResultsProxy.mapToSource((
                         self.modelResultsProxy.index(row, 0)))).background().color().rgba() == 4278190080:
                     BackColor = (50,220,175,100)
@@ -2191,18 +2191,18 @@ class Main():
         try:
             del self.window
         except Exception as e:
-            if debug is True: print clrmsg.DEBUG + str(e)
+            if debug is True: print(clrmsg.DEBUG + str(e))
 
 
 if __name__ == "__main__":
     if debug is True:
-        print clrmsg.DEBUG + 'Debug Test'
-        print clrmsg.OK + 'OK Test'
-        print clrmsg.ERROR + 'Error Test'
-        print clrmsg.INFO + 'Info Test'
-        print clrmsg.INFO + 'Info Test'
-        print clrmsg.WARNING + 'Warning Test'
-        print '='*20, 'Initializing', '='*20
+        print(clrmsg.DEBUG + 'Debug Test')
+        print(clrmsg.OK + 'OK Test')
+        print(clrmsg.ERROR + 'Error Test')
+        print(clrmsg.INFO + 'Info Test')
+        print(clrmsg.INFO + 'Info Test')
+        print(clrmsg.WARNING + 'Warning Test')
+        print('='*20, 'Initializing', '='*20)
 
     app = QtGui.QApplication(sys.argv)
 
