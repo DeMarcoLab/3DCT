@@ -1258,7 +1258,6 @@ class TestRigid3D(np_test.TestCase):
                 or (np.sign(e_res[1]) == -np.sign(e_flipped))
             ).all()
 
-
     def test_gl2_to_ck3(self):
         """
         Test gl2_to_ck3()
