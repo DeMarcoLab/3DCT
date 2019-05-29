@@ -4,20 +4,20 @@
 
 
 # @Title            : test_TDCT_main
-# @Project            : 3DCTv2
-# @Description        : pytest test
-# @Author            : Jan Arnold
+# @Project          : 3DCTv2
+# @Description      : pytest test
+# @Author           : Jan Arnold
 # @Email            : jan.arnold (at) coraxx.net
 # @Copyright        : Copyright (C) 2016  Jan Arnold
-# @License            : GPLv3 (see LICENSE file)
-# @Credits            :
-# @Maintainer        : Jan Arnold
-# @Date                : 2016/04
-# @Version            : 3DCT 2.3.0 module rev. 3
-# @Status            : stable
+# @License          : GPLv3 (see LICENSE file)
+# @Credits          :
+# @Maintainer       : Jan Arnold
+# @Date             : 2016/04
+# @Version          : 3DCT 2.3.0 module rev. 3
+# @Status           : stable
 # @Usage            : pytest
 # @Notes            :
-# @Python_version    : 2.7.11
+# @Python_version   : 2.7.11
 """
 # ======================================================================================================================
 import pytest
@@ -25,6 +25,7 @@ import os
 
 try:
     import TDCT_main
+
     TDCT_error = ""
     TDCT_main.debug = False
 except Exception as e:
@@ -32,27 +33,33 @@ except Exception as e:
 
 
 def test_TDCT_mainImport():
-    if 'TDCT_main' not in globals():
+    if "TDCT_main" not in globals():
         pytest.fail("TDCT_main import: {0}".format(TDCT_error))
 
 
-@pytest.mark.skipif(TDCT_error != "", reason="TDCT_main import failed: {0}".format(TDCT_error))
+@pytest.mark.skipif(
+    TDCT_error != "", reason="TDCT_main import failed: {0}".format(TDCT_error)
+)
 def test_TDCT_mainInit():
     window = TDCT_main.APP()
     assert window
 
 
-@pytest.mark.skipif(TDCT_error != "", reason="TDCT_main import failed: {0}".format(TDCT_error))
+@pytest.mark.skipif(
+    TDCT_error != "", reason="TDCT_main import failed: {0}".format(TDCT_error)
+)
 def test_splashScreen(maindir):
     print(maindir)
-    gif = os.path.join(maindir, 'icons', 'SplashScreen.gif')
+    gif = os.path.join(maindir, "icons", "SplashScreen.gif")
     assert os.path.isfile(gif) is True
     movie = TDCT_main.QtGui.QMovie(gif)
     splash = TDCT_main.MovieSplashScreen(movie)
     assert splash
 
 
-@pytest.mark.skipif(TDCT_error != "", reason="TDCT_main import failed: {0}".format(TDCT_error))
+@pytest.mark.skipif(
+    TDCT_error != "", reason="TDCT_main import failed: {0}".format(TDCT_error)
+)
 def test_guiFile(maindir):
     print(maindir)
     qtCreatorFile_main = os.path.join(maindir, "TDCT_main.ui")

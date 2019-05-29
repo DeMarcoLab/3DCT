@@ -101,22 +101,22 @@ The procedure is organized as follows:
         coordinate specified by parameter overview_center.
 
 # @Title            : correlation
-# @Project            : 3DCTv2
-# @Description        : Establishes EM - LM correlation and correlates spots between EM and LM
-# @Author            : Vladan Lucic (Max Planck Institute of Biochemistry)
-# @License            : GPLv3 (see LICENSE file)
+# @Project          : 3DCTv2
+# @Description      : Establishes EM - LM correlation and correlates spots between EM and LM
+# @Author           : Vladan Lucic (Max Planck Institute of Biochemistry)
+# @License          : GPLv3 (see LICENSE file)
 # @Email            :
-# @Credits            :
-# @Maintainer        : Vladan Lucic, Jan Arnold
-# @Date                : 2015/10
-# @Version            : 3DCT 2.3.0 module rev. 3
-# @Status            : stable
+# @Credits          :
+# @Maintainer       : Vladan Lucic, Jan Arnold
+# @Date             : 2015/10
+# @Version          : 3DCT 2.3.0 module rev. 3
+# @Status           : stable
 # @Usage            : import correlation.py and call main(markers_3d,markers_2d,spots_3d,rotation_center,results_file)
-#                     : "markers_3d", "markers_2d" and "spots_3d" are numpy arrays. Those contain 3D coordinates
-#                     : (arbitrary 3rd dimension for the 2D array). Marker coordinates are for the correlation and spot
-#                     : coordinates are points on which the correlation is applied to.
+#                   : "markers_3d", "markers_2d" and "spots_3d" are numpy arrays. Those contain 3D coordinates
+#                   : (arbitrary 3rd dimension for the 2D array). Marker coordinates are for the correlation and spot
+#                   : coordinates are points on which the correlation is applied to.
 # @Notes            : Edited and adapted by Jan Arnold (Max Planck Institute of Biochemistry)
-# @Python_version    : 2.7.11
+# @Python_version   : 2.7.11
 """
 # ======================================================================================================================
 
@@ -133,110 +133,155 @@ from pyto.rigid_3d import Rigid3D
 
 
 def write_results(
-        transf, res_file_name, spots_3d, spots_2d,
-        markers_3d, transformed_3d, markers_2d,rotation_center,modified_translation,imageProps=None):
+    transf,
+    res_file_name,
+    spots_3d,
+    spots_2d,
+    markers_3d,
+    transformed_3d,
+    markers_2d,
+    rotation_center,
+    modified_translation,
+    imageProps=None,
+):
     """
     """
 
     # open results file
-    res_file = open(res_file_name, 'w')
+    res_file = open(res_file_name, "w")
 
     # header top
     header = common.make_top_header()
 
     # extract eulers in degrees
-    eulers = transf.extract_euler(r=transf.q, mode='x', ret='one')
+    eulers = transf.extract_euler(r=transf.q, mode="x", ret="one")
     eulers = eulers * 180 / np.pi
 
     # correlation parameters
-    header.extend([
-        "#",
-        "# Transformation parameters",
-        "#",
-        "#   - rotation (Euler phi, psi, theta): [%6.3f, %6.3f, %6.3f]"
-        % (eulers[0], eulers[2], eulers[1]),
-        "#   - scale = %6.3f" % transf.s_scalar,
-        "#   - translation for rotation around [0,0,0] = [%6.3f, %6.3f, %6.3f]"
-        % (transf.d[0], transf.d[1], transf.d[2]),
-        "#   - translation for rotation around [%5.2f, %5.2f, %5.2f] = [%6.3f, %6.3f, %6.3f]"
-        % (rotation_center[0], rotation_center[1], rotation_center[2],
-                    modified_translation[0], modified_translation[1], modified_translation[2]),
-        "#   - rms error (in 2d pixels) = %6.2f" % transf.rmsError
-        ])
+    header.extend(
+        [
+            "#",
+            "# Transformation parameters",
+            "#",
+            "#   - rotation (Euler phi, psi, theta): [%6.3f, %6.3f, %6.3f]"
+            % (eulers[0], eulers[2], eulers[1]),
+            "#   - scale = %6.3f" % transf.s_scalar,
+            "#   - translation for rotation around [0,0,0] = [%6.3f, %6.3f, %6.3f]"
+            % (transf.d[0], transf.d[1], transf.d[2]),
+            "#   - translation for rotation around [%5.2f, %5.2f, %5.2f] = [%6.3f, %6.3f, %6.3f]"
+            % (
+                rotation_center[0],
+                rotation_center[1],
+                rotation_center[2],
+                modified_translation[0],
+                modified_translation[1],
+                modified_translation[2],
+            ),
+            "#   - rms error (in 2d pixels) = %6.2f" % transf.rmsError,
+        ]
+    )
 
     # check success
-    if transf.optimizeResult['success']:
-        header.extend([
-            "#   - optimization successful"])
+    if transf.optimizeResult["success"]:
+        header.extend(["#   - optimization successful"])
     else:
-        header.extend([
-            "#",
-            "# ERROR: Optimization failed (status %d)"
-            % transf.optimizeResult['status'],
-            "#   Repeat run with changed initial values and / or " +
-            "increased ninit"])
+        header.extend(
+            [
+                "#",
+                "# ERROR: Optimization failed (status %d)"
+                % transf.optimizeResult["status"],
+                "#   Repeat run with changed initial values and / or "
+                + "increased ninit",
+            ]
+        )
 
     # write header
     for line in header:
         res_file.write(line + os.linesep)
 
     # prepare marker lines
-    table = ([
+    table = [
         "#",
         "#",
         "# Transformation of initial (3D) markers",
         "#",
-        "#    Initial (3D) markers        Transformed initial" +
-        "        Final (2D) markers    Transformed-Final"])
+        "#    Initial (3D) markers        Transformed initial"
+        + "        Final (2D) markers    Transformed-Final",
+    ]
     out_vars = [
-                markers_3d[0,:], markers_3d[1,:], markers_3d[2,:],
-                transformed_3d[0,:], transformed_3d[1,:], transformed_3d[2,:],
-                markers_2d[0,:], markers_2d[1,:], transformed_3d[0,:]-markers_2d[0,:], transformed_3d[1,:]-markers_2d[1,:]
-                ]
-    out_format = '    %7.2f    %7.2f    %7.2f        %7.2f    %7.2f    %7.2f        %7.2f    %7.2f        %7.2f    %7.2f'
+        markers_3d[0, :],
+        markers_3d[1, :],
+        markers_3d[2, :],
+        transformed_3d[0, :],
+        transformed_3d[1, :],
+        transformed_3d[2, :],
+        markers_2d[0, :],
+        markers_2d[1, :],
+        transformed_3d[0, :] - markers_2d[0, :],
+        transformed_3d[1, :] - markers_2d[1, :],
+    ]
+    out_format = "    %7.2f    %7.2f    %7.2f        %7.2f    %7.2f    %7.2f        %7.2f    %7.2f        %7.2f    %7.2f"
     ids = list(range(markers_3d.shape[1]))
     res_tab_markers = pyto.util.arrayFormat(
-        arrays=out_vars, format=out_format, indices=ids, prependIndex=False)
+        arrays=out_vars, format=out_format, indices=ids, prependIndex=False
+    )
     table.extend(res_tab_markers)
 
     # prepare data lines
     if spots_3d.shape[0] != 0:
-        table.extend([
-            "#",
-            "#",
-            "# Correlation of 3D spots (POIs) to 2D",
-            "#",
-            "#    Spots (3D)            Correlated spots"])
+        table.extend(
+            [
+                "#",
+                "#",
+                "# Correlation of 3D spots (POIs) to 2D",
+                "#",
+                "#    Spots (3D)            Correlated spots",
+            ]
+        )
         out_vars = [
-                    spots_3d[0,:], spots_3d[1,:], spots_3d[2,:],
-                    spots_2d[0,:], spots_2d[1,:], spots_2d[2,:]
-                    ]
-        out_format = '    %6.0f    %6.0f    %6.0f        %7.2f    %7.2f    %7.2f'
+            spots_3d[0, :],
+            spots_3d[1, :],
+            spots_3d[2, :],
+            spots_2d[0, :],
+            spots_2d[1, :],
+            spots_2d[2, :],
+        ]
+        out_format = "    %6.0f    %6.0f    %6.0f        %7.2f    %7.2f    %7.2f"
         ids = list(range(spots_3d.shape[1]))
         res_tab_spots = pyto.util.arrayFormat(
-            arrays=out_vars, format=out_format, indices=ids, prependIndex=False)
+            arrays=out_vars, format=out_format, indices=ids, prependIndex=False
+        )
         table.extend(res_tab_spots)
 
     if spots_3d.shape[0] != 0 and imageProps:
         # POI distance from the FIB image's center in px and um, to mark calculated POI positions on the FIB
-        table.extend([
-            "#",
-            "#",
-            "# POI distance from the center of the SEM/FIB image in px and um",
-            "#",
-            "# Note: The center of the dual beam microscope view is regarded as 0,0 and distances from there",
-            "#       are measured in um. This center is at x/y = {0}/{1} in the correlated SEM/FIB tiff image".format(
-                imageProps[0][1]*0.5, imageProps[0][0]*0.5),
-            "#",
-            "#    Distance in px        Distance in um (pixel size: {0} um)".format(imageProps[1])])
+        table.extend(
+            [
+                "#",
+                "#",
+                "# POI distance from the center of the SEM/FIB image in px and um",
+                "#",
+                "# Note: The center of the dual beam microscope view is regarded as 0,0 and distances from there",
+                "#       are measured in um. This center is at x/y = {0}/{1} in the correlated SEM/FIB tiff image".format(
+                    imageProps[0][1] * 0.5, imageProps[0][0] * 0.5
+                ),
+                "#",
+                "#    Distance in px        Distance in um (pixel size: {0} um)".format(
+                    imageProps[1]
+                ),
+            ]
+        )
         out_vars = [
-                    spots_2d[0,:]-imageProps[0][1]*0.5, imageProps[0][0]*0.5-spots_2d[1,:],
-                    (spots_2d[0,:]-imageProps[0][1]*0.5)*imageProps[1], (imageProps[0][0]*0.5-spots_2d[1,:])*imageProps[1]
-                    ]
-        out_format = '    %7.2f    %7.2f        %7.2f    %7.2f'
+            spots_2d[0, :] - imageProps[0][1] * 0.5,
+            imageProps[0][0] * 0.5 - spots_2d[1, :],
+            (spots_2d[0, :] - imageProps[0][1] * 0.5) * imageProps[1],
+            (imageProps[0][0] * 0.5 - spots_2d[1, :]) * imageProps[1],
+        ]
+        out_format = "    %7.2f    %7.2f        %7.2f    %7.2f"
         ids = list(range(spots_2d.shape[1]))
         res_tab_spots = pyto.util.arrayFormat(
-            arrays=out_vars, format=out_format, indices=ids, prependIndex=False)
+            arrays=out_vars, format=out_format, indices=ids, prependIndex=False
+        )
         table.extend(res_tab_spots)
 
     # write data table
@@ -247,40 +292,50 @@ def write_results(
 ########## Main ##################################################################
 ##################################################################################
 
-def main(markers_3d,markers_2d,spots_3d,rotation_center,results_file,imageProps=None):
+
+def main(
+    markers_3d, markers_2d, spots_3d, rotation_center, results_file, imageProps=None
+):
 
     random_rotations = True
-    rotation_init = 'gl2'
+    rotation_init = "gl2"
     restrict_rotations = 0.1
     scale = None
     random_scale = True
-    scale_init = 'gl2'
+    scale_init = "gl2"
     ninit = 10
 
     # read fluo markers
     mark_3d = markers_3d[list(range(markers_3d.shape[0]))].transpose()
 
     # read ib markers
-    mark_2d = markers_2d[list(range(markers_2d.shape[0]))][:,:2].transpose()
+    mark_2d = markers_2d[list(range(markers_2d.shape[0]))][:, :2].transpose()
 
     # convert Eulers in degrees to Caley-Klein params
-    if (rotation_init is not None) and (rotation_init != 'gl2'):
+    if (rotation_init is not None) and (rotation_init != "gl2"):
         rotation_init_rad = rotation_init * np.pi / 180
-        einit = Rigid3D.euler_to_ck(angles=rotation_init_rad, mode='x')
+        einit = Rigid3D.euler_to_ck(angles=rotation_init_rad, mode="x")
     else:
         einit = rotation_init
 
     # establish correlation
     transf = Rigid3D.find_32(
-        x=mark_3d, y=mark_2d, scale=scale,
-        randome=random_rotations, einit=einit, einit_dist=restrict_rotations,
-        randoms=random_scale, sinit=scale_init, ninit=ninit)
+        x=mark_3d,
+        y=mark_2d,
+        scale=scale,
+        randome=random_rotations,
+        einit=einit,
+        einit_dist=restrict_rotations,
+        randoms=random_scale,
+        sinit=scale_init,
+        ninit=ninit,
+    )
 
     if imageProps:
         # establish correlation for cubic rotation (offset added to coordinates)
-        offsetZ = (max(imageProps[2])-imageProps[2][0])*0.5
-        offsetY = (max(imageProps[2])-imageProps[2][1])*0.5
-        offsetX = (max(imageProps[2])-imageProps[2][2])*0.5
+        offsetZ = (max(imageProps[2]) - imageProps[2][0]) * 0.5
+        offsetY = (max(imageProps[2]) - imageProps[2][1]) * 0.5
+        offsetX = (max(imageProps[2]) - imageProps[2][2]) * 0.5
         print(offsetZ, offsetY, offsetX)
         mark_3d_cube = np.copy(mark_3d)
         mark_3d_cube[0] += offsetX
@@ -288,9 +343,16 @@ def main(markers_3d,markers_2d,spots_3d,rotation_center,results_file,imageProps=
         mark_3d_cube[2] += offsetZ
 
         transf_cube = Rigid3D.find_32(
-            x=mark_3d_cube, y=mark_2d, scale=scale,
-            randome=random_rotations, einit=einit, einit_dist=restrict_rotations,
-            randoms=random_scale, sinit=scale_init, ninit=ninit)
+            x=mark_3d_cube,
+            y=mark_2d,
+            scale=scale,
+            randome=random_rotations,
+            einit=einit,
+            einit_dist=restrict_rotations,
+            randoms=random_scale,
+            sinit=scale_init,
+            ninit=ninit,
+        )
     else:
         transf_cube = transf
 
@@ -308,18 +370,26 @@ def main(markers_3d,markers_2d,spots_3d,rotation_center,results_file,imageProps=
 
     # calculate translation if rotation center is not at (0,0,0)
     modified_translation = transf_cube.recalculate_translation(
-        rotation_center=rotation_center)
+        rotation_center=rotation_center
+    )
     # print('modified_translation: ', modified_translation)
 
     # write transformation params and correlation
-    if results_file != '':
+    if results_file != "":
         write_results(
-            transf=transf, res_file_name=results_file,
-            spots_3d=spots_3d, spots_2d=spots_2d,
-            markers_3d=mark_3d, transformed_3d=transf_3d, markers_2d=mark_2d,
-            rotation_center=rotation_center, modified_translation=modified_translation,imageProps=imageProps)
+            transf=transf,
+            res_file_name=results_file,
+            spots_3d=spots_3d,
+            spots_2d=spots_2d,
+            markers_3d=mark_3d,
+            transformed_3d=transf_3d,
+            markers_2d=mark_2d,
+            rotation_center=rotation_center,
+            modified_translation=modified_translation,
+            imageProps=imageProps,
+        )
     cm_3D_markers = mark_3d.mean(axis=-1).tolist()
 
     # delta calc,real
-    delta2D = transf_3d[:2,:] - mark_2d
+    delta2D = transf_3d[:2, :] - mark_2d
     return [transf, transf_3d, spots_2d, delta2D, cm_3D_markers, modified_translation]

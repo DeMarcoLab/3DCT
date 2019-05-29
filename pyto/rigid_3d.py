@@ -13,10 +13,12 @@ from functools import partial
 
 import numpy as np
 import scipy as sp
+
 # added for sp.stat
 import scipy.stats
 
 from .affine import Affine
+
 
 class Rigid3D(Affine):
     """
@@ -29,23 +31,23 @@ class Rigid3D(Affine):
     in d dimensions has a shape dxn.
     """
 
-    def __init__(self, order='qpsm'):
+    def __init__(self, order="qpsm"):
         """
         Sets self.order from arguments and self.xy_axes to 'dim_point' .
 
         """
 
         # initialize
-        #super(self.__class__, self).__init__(gl, d)
+        # super(self.__class__, self).__init__(gl, d)
         self.gl = None
         self.d = None
         self.order = order
 
         # fixed, for now at least
-        self.xy_axes = 'dim_point'
+        self.xy_axes = "dim_point"
 
         # transformation parameters
-        self.param_names = ['q', 'p', 's', 'm', 'u', 'v']
+        self.param_names = ["q", "p", "s", "m", "u", "v"]
 
     ##############################################################
     #
@@ -108,21 +110,21 @@ class Rigid3D(Affine):
     #
 
     @classmethod
-    def find(cls, x, y, scale=None, xy_axes='dim_point'):
+    def find(cls, x, y, scale=None, xy_axes="dim_point"):
         """
         Should be implemented
         """
         raise NotImplementedError()
 
     @classmethod
-    def findTwoStep(cls, x, y, scale=None, xy_axes='dim_point'):
+    def findTwoStep(cls, x, y, scale=None, xy_axes="dim_point"):
         """
         Probably no need to be implemented
         """
         raise NotImplementedError()
 
     @classmethod
-    def findTranslation(cls, x, y, scale=None, xy_axes='dim_point'):
+    def findTranslation(cls, x, y, scale=None, xy_axes="dim_point"):
         """
         Probably not needed
         """
@@ -143,9 +145,21 @@ class Rigid3D(Affine):
 
     @classmethod
     def find_32(
-            cls, x, y, scale=None, use_jac=True, mode='constr_ck',
-            ninit=10, randome=False, einit=None, einit_dist=0.1,
-            randoms=False, sinit=1., maxiter=1000, return_all=False):
+        cls,
+        x,
+        y,
+        scale=None,
+        use_jac=True,
+        mode="constr_ck",
+        ninit=10,
+        randome=False,
+        einit=None,
+        einit_dist=0.1,
+        randoms=False,
+        sinit=1.0,
+        maxiter=1000,
+        return_all=False,
+    ):
         """
         Finds optimal 3D transformation consisting of rotation, scale
         (optional) and translation that transform initial point coordinates
@@ -233,13 +247,14 @@ class Rigid3D(Affine):
         """
 
         # check mode
-        if mode != 'constr_ck':
+        if mode != "constr_ck":
             raise ValueError(
-                "Sorry, the only mode currently implemented is 'constr_ck'.")
+                "Sorry, the only mode currently implemented is 'constr_ck'."
+            )
 
         # convert to cm coords
-        x_cm = x.mean(axis=-1).reshape((3,1))
-        y_cm = y.mean(axis=-1).reshape((2,1))
+        x_cm = x.mean(axis=-1).reshape((3, 1))
+        y_cm = y.mean(axis=-1).reshape((2, 1))
         x_prime = x - x_cm
         y_prime = y - y_cm
 
@@ -249,13 +264,13 @@ class Rigid3D(Affine):
             einit_loc = einit
         elif isinstance(einit, (np.ndarray, list)):
             einit_loc = einit
-        elif isinstance(einit, str) and (einit == 'gl2'):
+        elif isinstance(einit, str) and (einit == "gl2"):
             gl2 = True
             einit_loc, s_gl22 = cls.approx_gl2_to_ck3(
-                x=x_prime, y=y_prime, xy_axes='dim_point', ret='both')
+                x=x_prime, y=y_prime, xy_axes="dim_point", ret="both"
+            )
         else:
-            raise ValueError(
-                "Argument einit " + str(einit) + " was not understood")
+            raise ValueError("Argument einit " + str(einit) + " was not understood")
 
         # find initial conditions for s
         if scale is None:
@@ -265,15 +280,15 @@ class Rigid3D(Affine):
                 sinit_loc = sinit
             elif isinstance(sinit, (float, int)):
                 sinit_loc = sinit
-            elif isinstance(sinit, str) and (sinit == 'gl2'):
+            elif isinstance(sinit, str) and (sinit == "gl2"):
                 if gl2:
                     sinit_loc = s_gl22
                 else:
                     dummy, sinit_loc = cls.approx_gl2_to_ck3(
-                        x=x_prime, y=y_prime, xy_axes='dim_point', ret='both')
+                        x=x_prime, y=y_prime, xy_axes="dim_point", ret="both"
+                    )
             else:
-                raise ValueError(
-                    "Argument sinit " + str(sinit) + " was not understood")
+                raise ValueError("Argument sinit " + str(sinit) + " was not understood")
 
         elif isinstance(sinit, (float, int)):
 
@@ -283,8 +298,10 @@ class Rigid3D(Affine):
 
         # adjust n iterations
         if (randome is False) and (randoms is False):
-            if gl2: ninit_loc = 2
-            else: ninit_loc = 1
+            if gl2:
+                ninit_loc = 2
+            else:
+                ninit_loc = 1
         else:
             ninit_loc = ninit
 
@@ -293,10 +310,20 @@ class Rigid3D(Affine):
 
             # standard (not gl2)
             res = cls.find_32_constr_ck_multi(
-                x=x_prime, y=y_prime, cm=False, use_jac=use_jac,
-                randome=randome, einit=einit_loc, einit_dist=einit_dist,
-                scale=scale, randoms=randoms, sinit=sinit_loc, maxiter=maxiter,
-                ninit=ninit_loc, return_all=return_all)
+                x=x_prime,
+                y=y_prime,
+                cm=False,
+                use_jac=use_jac,
+                randome=randome,
+                einit=einit_loc,
+                einit_dist=einit_dist,
+                scale=scale,
+                randoms=randoms,
+                sinit=sinit_loc,
+                maxiter=maxiter,
+                ninit=ninit_loc,
+                return_all=return_all,
+            )
             if return_all:
                 rigid_cm, all_rigid_cm = res
             else:
@@ -307,14 +334,32 @@ class Rigid3D(Affine):
             # gl2 so do for both possibilities
             ninit_1 = max(int(ninit_loc / 2), 1)
             res_1 = cls.find_32_constr_ck_multi(
-                x=x_prime, y=y_prime, cm=False, use_jac=use_jac, ninit=ninit_1,
-                randome=randome, einit=einit_loc[0], einit_dist=einit_dist,
-                randoms=randoms, sinit=sinit_loc, maxiter=maxiter)
+                x=x_prime,
+                y=y_prime,
+                cm=False,
+                use_jac=use_jac,
+                ninit=ninit_1,
+                randome=randome,
+                einit=einit_loc[0],
+                einit_dist=einit_dist,
+                randoms=randoms,
+                sinit=sinit_loc,
+                maxiter=maxiter,
+            )
             ninit_2 = max(ninit_loc - ninit_1, 1)
             res_2 = cls.find_32_constr_ck_multi(
-                x=x_prime, y=y_prime, cm=False, use_jac=use_jac, ninit=ninit_2,
-                randome=randome, einit=einit_loc[1], einit_dist=einit_dist,
-                randoms=randoms, sinit=sinit_loc, maxiter=maxiter)
+                x=x_prime,
+                y=y_prime,
+                cm=False,
+                use_jac=use_jac,
+                ninit=ninit_2,
+                randome=randome,
+                einit=einit_loc[1],
+                einit_dist=einit_dist,
+                randoms=randoms,
+                sinit=sinit_loc,
+                maxiter=maxiter,
+            )
 
             if return_all:
                 rigid_cm_1, all_rigid_cm_1 = res_1
@@ -330,8 +375,7 @@ class Rigid3D(Affine):
                 best = rigid_cm_2
 
         # get translation
-        translation_2 = (
-            y_cm - best.s_scalar * np.dot(best.q[0:2,:], x_cm))
+        translation_2 = y_cm - best.s_scalar * np.dot(best.q[0:2, :], x_cm)
         translation = np.vstack((translation_2, [0]))
 
         # calculate full y in original (non-center of mass) frame
@@ -347,9 +391,21 @@ class Rigid3D(Affine):
 
     @classmethod
     def find_32_constr_ck_multi(
-            cls, x, y, scale=None, cm=False, use_jac=True,
-            ninit=10, randome=False, einit=None, einit_dist=0.1,
-            randoms=False, sinit=1., maxiter=1000, return_all=False):
+        cls,
+        x,
+        y,
+        scale=None,
+        cm=False,
+        use_jac=True,
+        ninit=10,
+        randome=False,
+        einit=None,
+        einit_dist=0.1,
+        randoms=False,
+        sinit=1.0,
+        maxiter=1000,
+        return_all=False,
+    ):
         """
 
 
@@ -402,8 +458,8 @@ class Rigid3D(Affine):
         """
 
         # default initial values
-        default_e = np.array([1.,0,0,0])
-        default_s = 1.
+        default_e = np.array([1.0, 0, 0, 0])
+        default_s = 1.0
 
         # find best solution from random initial values
         best = None
@@ -424,7 +480,8 @@ class Rigid3D(Affine):
                         one_einit = einit
                     else:
                         one_einit = cls.make_random_ck(
-                            center=einit, distance=einit_dist)
+                            center=einit, distance=einit_dist
+                        )
 
             else:
 
@@ -442,17 +499,15 @@ class Rigid3D(Affine):
                     if sinit is None:
 
                         # random around 1
-                        one_s_init = sp.stats.maxwell.rvs(
-                            loc=0, scale=default_s)
+                        one_s_init = sp.stats.maxwell.rvs(loc=0, scale=default_s)
 
                     else:
 
                         # random around init s
-                        if init_ind == 1.:
+                        if init_ind == 1.0:
                             one_s_init = sinit
                         else:
-                            one_s_init = sp.stats.maxwell.rvs(
-                                loc=0, scale=sinit)
+                            one_s_init = sp.stats.maxwell.rvs(loc=0, scale=sinit)
                 else:
 
                     # single param set, default or specified
@@ -471,13 +526,13 @@ class Rigid3D(Affine):
 
             # solve and see if best solution so far
             rigid = cls.find_32_constr_ck(
-                x=x, y=y, scale=scale, init=one_init, use_jac=use_jac,
-                maxiter=maxiter)
+                x=x, y=y, scale=scale, init=one_init, use_jac=use_jac, maxiter=maxiter
+            )
             all.append(rigid)
             try:
                 if rigid.optimizeResult.fun < best.optimizeResult.fun:
                     best = rigid
-            except(NameError, AttributeError):
+            except (NameError, AttributeError):
                 best = rigid
 
         # return only the best solution or the best and all solutions
@@ -488,8 +543,8 @@ class Rigid3D(Affine):
 
     @classmethod
     def find_32_constr_ck(
-            cls, x, y, scale=None, init=None, cm=False, use_jac=True,
-            maxiter=1000):
+        cls, x, y, scale=None, init=None, cm=False, use_jac=True, maxiter=1000
+    ):
         """
         Finds rigid transformation in 3D that transforms points x (initial)
         into points y (final) when only the first two coordinates are given
@@ -540,8 +595,8 @@ class Rigid3D(Affine):
 
         # convert to CM coords
         if cm:
-            x_prime = x - x.mean(axis=-1).reshape((3,1))
-            y_prime = y - y.mean(axis=-1).reshape((2,1))
+            x_prime = x - x.mean(axis=-1).reshape((3, 1))
+            y_prime = y - y.mean(axis=-1).reshape((2, 1))
         else:
             x_prime = x
             y_prime = y
@@ -553,13 +608,23 @@ class Rigid3D(Affine):
 
         # function to mimimize
         sq_diff_ck = partial(
-            cls.sq_diff_ck_23, scale=scale, xxt=xxt, yxt=yxt,
-            make_r=cls.make_r_ck, const=tryy)
+            cls.sq_diff_ck_23,
+            scale=scale,
+            xxt=xxt,
+            yxt=yxt,
+            make_r=cls.make_r_ck,
+            const=tryy,
+        )
 
         # derivatives
         sq_diff_ck_deriv = partial(
-            cls.sq_diff_ck_23_deriv, scale=scale, yxt=yxt, xxt=xxt,
-            make_r=cls.make_r_ck, make_r_deriv=cls.make_r_ck_deriv)
+            cls.sq_diff_ck_23_deriv,
+            scale=scale,
+            yxt=yxt,
+            xxt=xxt,
+            make_r=cls.make_r_ck,
+            make_r_deriv=cls.make_r_ck_deriv,
+        )
 
         # check if should use derivatives
         if use_jac:
@@ -572,82 +637,124 @@ class Rigid3D(Affine):
 
             # e normalized to 1, scale > 0
             constr_ck_norm = (
-                {'type' : 'eq',
-                 'fun' : lambda par: (par[:4]**2).sum() - 1,
-                 'jac' : lambda par: np.hstack((np.asarray(2 * par[:4]), [0]))},
-                {'type' : 'ineq',
-                'fun' : lambda par: np.array(1 - par[0]),
-                 'jac' : lambda par: np.array([-1,0,0,0,0])},
-                {'type' : 'ineq',
-                 'fun' : lambda par: np.array(1 - par[1]),
-                 'jac' : lambda par: np.array([0,-1,0,0,0])},
-                {'type' : 'ineq',
-                 'fun' : lambda par: np.array(1 - par[2]),
-                 'jac' : lambda par: np.array([0,0,-1,0,0])},
-                {'type' : 'ineq',
-                 'fun' : lambda par: np.array(1 - par[3]),
-                 'jac' : lambda par: np.array([0,0,0,-1,0])},
-                {'type' : 'ineq',
-                'fun' : lambda par: np.array(1 + par[0]),
-                 'jac' : lambda par: np.array([1,0,0,0,0])},
-                {'type' : 'ineq',
-                 'fun' : lambda par: np.array(1 + par[1]),
-                 'jac' : lambda par: np.array([0,1,0,0,0])},
-                {'type' : 'ineq',
-                 'fun' : lambda par: np.array(1 + par[2]),
-                 'jac' : lambda par: np.array([0,0,1,0,0])},
-                {'type' : 'ineq',
-                 'fun' : lambda par: np.array(1 + par[3]),
-                 'jac' : lambda par: np.array([0,0,0,1,0])},
-                {'type' : 'ineq',
-                 'fun' : lambda par: np.array(par[4]),
-                 'jac' : lambda par: np.array([0,0,0,0,1])},
-                )
+                {
+                    "type": "eq",
+                    "fun": lambda par: (par[:4] ** 2).sum() - 1,
+                    "jac": lambda par: np.hstack((np.asarray(2 * par[:4]), [0])),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(1 - par[0]),
+                    "jac": lambda par: np.array([-1, 0, 0, 0, 0]),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(1 - par[1]),
+                    "jac": lambda par: np.array([0, -1, 0, 0, 0]),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(1 - par[2]),
+                    "jac": lambda par: np.array([0, 0, -1, 0, 0]),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(1 - par[3]),
+                    "jac": lambda par: np.array([0, 0, 0, -1, 0]),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(1 + par[0]),
+                    "jac": lambda par: np.array([1, 0, 0, 0, 0]),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(1 + par[1]),
+                    "jac": lambda par: np.array([0, 1, 0, 0, 0]),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(1 + par[2]),
+                    "jac": lambda par: np.array([0, 0, 1, 0, 0]),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(1 + par[3]),
+                    "jac": lambda par: np.array([0, 0, 0, 1, 0]),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(par[4]),
+                    "jac": lambda par: np.array([0, 0, 0, 0, 1]),
+                },
+            )
 
         else:
 
             # e normalized to 1
             constr_ck_norm = (
-                {'type' : 'eq',
-                 'fun' : lambda par: (par**2).sum() - 1,
-                 'jac' : lambda par: np.asarray(2 * par)},
-                {'type' : 'ineq',
-                'fun' : lambda par: np.array(1 - par[0]),
-                 'jac' : lambda par: np.array([-1,0,0,0])},
-                {'type' : 'ineq',
-                 'fun' : lambda par: np.array(1 - par[1]),
-                 'jac' : lambda par: np.array([0,-1,0,0])},
-                {'type' : 'ineq',
-                 'fun' : lambda par: np.array(1 - par[2]),
-                 'jac' : lambda par: np.array([0,0,-1,0])},
-                {'type' : 'ineq',
-                 'fun' : lambda par: np.array(1 - par[3]),
-                 'jac' : lambda par: np.array([0,0,0,-1])},
-                {'type' : 'ineq',
-                'fun' : lambda par: np.array(1 + par[0]),
-                 'jac' : lambda par: np.array([1,0,0,0])},
-                {'type' : 'ineq',
-                 'fun' : lambda par: np.array(1 + par[1]),
-                 'jac' : lambda par: np.array([0,1,0,0])},
-                {'type' : 'ineq',
-                 'fun' : lambda par: np.array(1 + par[2]),
-                 'jac' : lambda par: np.array([0,0,1,0])},
-                {'type' : 'ineq',
-                 'fun' : lambda par: np.array(1 + par[3]),
-                 'jac' : lambda par: np.array([0,0,0,1])}
-                )
+                {
+                    "type": "eq",
+                    "fun": lambda par: (par ** 2).sum() - 1,
+                    "jac": lambda par: np.asarray(2 * par),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(1 - par[0]),
+                    "jac": lambda par: np.array([-1, 0, 0, 0]),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(1 - par[1]),
+                    "jac": lambda par: np.array([0, -1, 0, 0]),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(1 - par[2]),
+                    "jac": lambda par: np.array([0, 0, -1, 0]),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(1 - par[3]),
+                    "jac": lambda par: np.array([0, 0, 0, -1]),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(1 + par[0]),
+                    "jac": lambda par: np.array([1, 0, 0, 0]),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(1 + par[1]),
+                    "jac": lambda par: np.array([0, 1, 0, 0]),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(1 + par[2]),
+                    "jac": lambda par: np.array([0, 0, 1, 0]),
+                },
+                {
+                    "type": "ineq",
+                    "fun": lambda par: np.array(1 + par[3]),
+                    "jac": lambda par: np.array([0, 0, 0, 1]),
+                },
+            )
 
         # init: [1, 0, 0, ...]
         if init is None:
             if scale is None:
-                init = np.array([1.,0,0,0,1])
+                init = np.array([1.0, 0, 0, 0, 1])
             else:
-                init = np.array([1.,0,0,0])
+                init = np.array([1.0, 0, 0, 0])
 
         # solve
         res = sp.optimize.minimize(
-            sq_diff_ck, init, jac=jac, constraints=constr_ck_norm,
-            options={'disp': True, 'maxiter' : maxiter})
+            sq_diff_ck,
+            init,
+            jac=jac,
+            constraints=constr_ck_norm,
+            options={"disp": True, "maxiter": maxiter},
+        )
 
         # optimized parameters
         e_params = res.x[:4]
@@ -658,7 +765,7 @@ class Rigid3D(Affine):
 
         # calculate missing r and y components
         r_33 = cls.make_r_ck(e_params)
-        y_3 = s * np.dot(r_33[2,:], x_prime)
+        y_3 = s * np.dot(r_33[2, :], x_prime)
         y_33 = np.vstack((y_prime, y_3))
 
         # make instance
@@ -671,8 +778,8 @@ class Rigid3D(Affine):
         inst.ck = e_params
         inst.optimizeResult = res
         inst.initial_params = init
-        inst.error = y_prime - np.dot(inst.gl[:2,:], x_prime)
-        #inst.rmsError = np.sqrt(np.square(inst.error).sum() / x_prime.shape[1])
+        inst.error = y_prime - np.dot(inst.gl[:2, :], x_prime)
+        # inst.rmsError = np.sqrt(np.square(inst.error).sum() / x_prime.shape[1])
 
         return inst
 
@@ -697,19 +804,18 @@ class Rigid3D(Affine):
 
         # make r
         r_33 = make_r([e0, e1, e2, e3])
-        r = r_33[:2,:]
+        r = r_33[:2, :]
 
         # square differences: s^2 tr(x x_t r_t r) - 2 s tr(x y_t r)
         rtr = np.dot(r.transpose(), r)
-        term_1 = s**2 * (xxt * rtr).sum()
+        term_1 = s ** 2 * (xxt * rtr).sum()
         term_2 = -2 * s * (yxt * r).sum()
         res = const + term_1 + term_2
 
         return res
 
     @classmethod
-    def sq_diff_ck_23_deriv(
-            cls, param, scale, yxt, xxt, make_r, make_r_deriv):
+    def sq_diff_ck_23_deriv(cls, param, scale, yxt, xxt, make_r, make_r_deriv):
         """
         Calculates derivative (Jacobian) of sum of square differences
         in respect to Cayley-Klein parameters.
@@ -726,8 +832,8 @@ class Rigid3D(Affine):
             s = scale
 
         # prepare matrices
-        r = make_r(e=e_params)[:2,:]
-        dr_de = make_r_deriv(e=e_params)[:,:2,:]
+        r = make_r(e=e_params)[:2, :]
+        dr_de = make_r_deriv(e=e_params)[:, :2, :]
 
         # calculate derivatives by e
         temp = 2 * s * (s * np.dot(r, xxt) - yxt)
@@ -744,7 +850,7 @@ class Rigid3D(Affine):
         return derivs
 
     @classmethod
-    def approx_gl2_to_ck3(cls, x, y, xy_axes='dim_point', ret='both'):
+    def approx_gl2_to_ck3(cls, x, y, xy_axes="dim_point", ret="both"):
         """
         Finds an approximate rigid (+scale) 3D transformation from 2D markers
         based on Gl(2) conversion to 3D rotation (and scale).
@@ -767,13 +873,14 @@ class Rigid3D(Affine):
          """
 
         # remove 3rd dim from x
-        if xy_axes == 'dim_point':
-            x2 = x[:2,:]
-        elif xy_axes == 'point_dim':
-            x2 = x[:,:2]
+        if xy_axes == "dim_point":
+            x2 = x[:2, :]
+        elif xy_axes == "point_dim":
+            x2 = x[:, :2]
 
         # find 2d affine
         from .affine_2d import Affine2D
+
         affine22 = Affine2D.find(x2, y, xy_axes=xy_axes)
 
         # find corresponding ck params
@@ -782,7 +889,7 @@ class Rigid3D(Affine):
         return res
 
     @classmethod
-    def gl2_to_ck3(cls, gl, ret='both'):
+    def gl2_to_ck3(cls, gl, ret="both"):
         """
         Finds Cayley-Klein parameters for a 3D rotation and scale that
         corresponsds to Gl(2) transformation gl.
@@ -807,39 +914,42 @@ class Rigid3D(Affine):
         # SV decompose gl
         from .affine import Affine
         from .affine_2d import Affine2D
+
         aff = Affine()
         u, p, s, v = aff.decomposeSV(gl=gl)
 
         # convert to euler angles
-        #v_angle = np.arctan2(v[1,0], v[0,0])
-        #fi = v_angle
+        # v_angle = np.arctan2(v[1,0], v[0,0])
+        # fi = v_angle
         fi = Affine2D.getAngle(v)
         s_diag = np.diag(s)
         s_scalar = s_diag.max()
         s2 = s_diag.min() / s_diag.max()
         theta = np.arccos(s2)
-        #u_angle = np.arctan2(u[1,0], u[0,0])
-        #psi = u_angle
+        # u_angle = np.arctan2(u[1,0], u[0,0])
+        # psi = u_angle
         psi = Affine2D.getAngle(u)
 
         # euler angles to ck params
-        e_param = cls.euler_to_ck(angles=[fi, theta, psi], mode='x')
+        e_param = cls.euler_to_ck(angles=[fi, theta, psi], mode="x")
 
         # get the other value if needed
-        if ret == 'one':
+        if ret == "one":
             pass
-        elif ret == 'both':
+        elif ret == "both":
             e_param_2 = e_param.copy()
             e_param_2[1] = -e_param[1]
             e_param_2[2] = -e_param[2]
             e_param = [e_param, e_param_2]
         else:
             raise ValueError(
-                "Could not understand argument ret: " + str(ret) + " . Valid "
-                + "options are 'one' and 'both'")
+                "Could not understand argument ret: "
+                + str(ret)
+                + " . Valid "
+                + "options are 'one' and 'both'"
+            )
 
         return e_param, s_scalar
-
 
     #########################################################
     #
@@ -858,12 +968,24 @@ class Rigid3D(Affine):
         """
 
         r = np.array(
-            [[e[0]**2 + e[1]**2 - e[2]**2 - e[3]**2,
-              2 * (e[1]*e[2] - e[0]*e[3]), 2 * (e[1]*e[3] + e[0]*e[2])],
-             [2 * (e[1]*e[2] + e[0]*e[3]), e[0]**2 - e[1]**2 + e[2]**2 -e[3]**2,
-              2 * (e[2]*e[3] - e[0]*e[1])],
-             [2 * (e[1]*e[3] - e[0]*e[2]), 2 * (e[2]*e[3] + e[0]*e[1]),
-              e[0]**2 - e[1]**2 - e[2]**2 + e[3]**2]])
+            [
+                [
+                    e[0] ** 2 + e[1] ** 2 - e[2] ** 2 - e[3] ** 2,
+                    2 * (e[1] * e[2] - e[0] * e[3]),
+                    2 * (e[1] * e[3] + e[0] * e[2]),
+                ],
+                [
+                    2 * (e[1] * e[2] + e[0] * e[3]),
+                    e[0] ** 2 - e[1] ** 2 + e[2] ** 2 - e[3] ** 2,
+                    2 * (e[2] * e[3] - e[0] * e[1]),
+                ],
+                [
+                    2 * (e[1] * e[3] - e[0] * e[2]),
+                    2 * (e[2] * e[3] + e[0] * e[1]),
+                    e[0] ** 2 - e[1] ** 2 - e[2] ** 2 + e[3] ** 2,
+                ],
+            ]
+        )
 
         return r
 
@@ -880,19 +1002,21 @@ class Rigid3D(Affine):
 
         dr_de = 2 * np.array(
             # dr / de_0
-            [[[e[0], -e[3], e[2]], [e[3], e[0], -e[1]], [-e[2], e[1], e[0]]],
-             # dr / de_1
-             [[e[1], e[2], e[3]], [e[2], -e[1], -e[0]], [e[3], e[0], -e[1]]],
-             # dr / de_2
-             [[-e[2], e[1], e[0]], [e[1], e[2], e[3]], [-e[0], e[3], -e[2]]],
-             # dr / dr_3
-             [[-e[3], -e[0], e[1]], [e[0], -e[3], e[2]], [e[1], e[2], e[3]]]]
+            [
+                [[e[0], -e[3], e[2]], [e[3], e[0], -e[1]], [-e[2], e[1], e[0]]],
+                # dr / de_1
+                [[e[1], e[2], e[3]], [e[2], -e[1], -e[0]], [e[3], e[0], -e[1]]],
+                # dr / de_2
+                [[-e[2], e[1], e[0]], [e[1], e[2], e[3]], [-e[0], e[3], -e[2]]],
+                # dr / dr_3
+                [[-e[3], -e[0], e[1]], [e[0], -e[3], e[2]], [e[1], e[2], e[3]]],
+            ]
         )
 
         return dr_de
 
     @classmethod
-    def make_r_euler(cls, angles, mode='x'):
+    def make_r_euler(cls, angles, mode="x"):
         """
         Returns 3D rotation matrix parametrized by Euler angles.
 
@@ -915,51 +1039,88 @@ class Rigid3D(Affine):
           - mode: Euler angles convention
         """
 
-        if mode == 'x':
+        if mode == "x":
 
             phi, theta, psi = angles
             r = np.array(
-                [[(np.cos(psi) * np.cos(phi)
-                   - np.cos(theta) * np.sin(phi) * np.sin(psi)),
-                  (-np.sin(phi) * np.cos(psi)
-                   - np.cos(theta) * np.sin(psi) * np.cos(phi)),
-                  np.sin(theta) * np.sin(psi)],
-                 [(np.cos(phi) * np.sin(psi)
-                   + np.cos(theta) * np.cos(psi) * np.sin(phi)),
-                  (-np.sin(psi) * np.sin(phi)
-                   + np.cos(theta) * np.cos(phi) * np.cos(psi)),
-                  -np.sin(theta) * np.cos(psi)],
-                 [np.sin(phi) * np.sin(theta),
-                  np.cos(phi) * np.sin(theta),
-                  np.cos(theta)]])
+                [
+                    [
+                        (
+                            np.cos(psi) * np.cos(phi)
+                            - np.cos(theta) * np.sin(phi) * np.sin(psi)
+                        ),
+                        (
+                            -np.sin(phi) * np.cos(psi)
+                            - np.cos(theta) * np.sin(psi) * np.cos(phi)
+                        ),
+                        np.sin(theta) * np.sin(psi),
+                    ],
+                    [
+                        (
+                            np.cos(phi) * np.sin(psi)
+                            + np.cos(theta) * np.cos(psi) * np.sin(phi)
+                        ),
+                        (
+                            -np.sin(psi) * np.sin(phi)
+                            + np.cos(theta) * np.cos(phi) * np.cos(psi)
+                        ),
+                        -np.sin(theta) * np.cos(psi),
+                    ],
+                    [
+                        np.sin(phi) * np.sin(theta),
+                        np.cos(phi) * np.sin(theta),
+                        np.cos(theta),
+                    ],
+                ]
+            )
 
-        elif mode == 'test':
+        elif mode == "test":
 
             phi, theta, psi = angles
             r = np.array(
-                [[(np.cos(psi) * np.cos(phi)
-                   - np.cos(theta) * np.sin(phi) * np.sin(psi)),
-                  (-np.sin(psi) * np.cos(phi)
-                   - np.cos(theta) * np.sin(phi) * np.cos(psi)),
-                  np.sin(theta) * np.sin(phi)],
-                 [(np.cos(psi) * np.sin(phi)
-                   + np.cos(theta) * np.cos(phi) * np.sin(psi)),
-                  (-np.sin(psi) * np.sin(phi)
-                   + np.cos(theta) * np.cos(phi) * np.cos(psi)),
-                  -np.sin(theta) * np.cos(phi)],
-                 [np.sin(psi) * np.sin(theta),
-                  np.cos(psi) * np.sin(theta),
-                  np.cos(theta)]])
+                [
+                    [
+                        (
+                            np.cos(psi) * np.cos(phi)
+                            - np.cos(theta) * np.sin(phi) * np.sin(psi)
+                        ),
+                        (
+                            -np.sin(psi) * np.cos(phi)
+                            - np.cos(theta) * np.sin(phi) * np.cos(psi)
+                        ),
+                        np.sin(theta) * np.sin(phi),
+                    ],
+                    [
+                        (
+                            np.cos(psi) * np.sin(phi)
+                            + np.cos(theta) * np.cos(phi) * np.sin(psi)
+                        ),
+                        (
+                            -np.sin(psi) * np.sin(phi)
+                            + np.cos(theta) * np.cos(phi) * np.cos(psi)
+                        ),
+                        -np.sin(theta) * np.cos(phi),
+                    ],
+                    [
+                        np.sin(psi) * np.sin(theta),
+                        np.cos(psi) * np.sin(theta),
+                        np.cos(theta),
+                    ],
+                ]
+            )
 
         else:
             raise ValueError(
-                "Mode " + mode + "is not defined. Currently implemented is "
-                + " mode 'x'")
+                "Mode "
+                + mode
+                + "is not defined. Currently implemented is "
+                + " mode 'x'"
+            )
 
         return r
 
     @classmethod
-    def extract_euler(cls, r, mode='x', ret='one'):
+    def extract_euler(cls, r, mode="x", ret="one"):
         """
         Calculates Euler angles from a rotation matrix.
 
@@ -970,65 +1131,69 @@ class Rigid3D(Affine):
         [phi + psi, 0, 0] and [0, 0, phi + psi].
         """
 
-        if mode == 'x':
+        if mode == "x":
 
-            theta_1 = np.arccos(r[2,2])
+            theta_1 = np.arccos(r[2, 2])
             theta_2 = -theta_1
 
             if theta_1 != 0:
 
                 psi_1 = np.arctan2(
-                    r[0,2] / np.sin(theta_1), -r[1,2] / np.sin(theta_1))
+                    r[0, 2] / np.sin(theta_1), -r[1, 2] / np.sin(theta_1)
+                )
                 psi_2 = np.arctan2(
-                    r[0,2] / np.sin(-theta_1), -r[1,2] / np.sin(-theta_1))
+                    r[0, 2] / np.sin(-theta_1), -r[1, 2] / np.sin(-theta_1)
+                )
 
-                phi_1 = np.arctan2(
-                    r[2,0] / np.sin(theta_1), r[2,1] / np.sin(theta_1))
+                phi_1 = np.arctan2(r[2, 0] / np.sin(theta_1), r[2, 1] / np.sin(theta_1))
                 phi_2 = np.arctan2(
-                    r[2,0] / np.sin(-theta_1), r[2,1] / np.sin(-theta_1))
+                    r[2, 0] / np.sin(-theta_1), r[2, 1] / np.sin(-theta_1)
+                )
 
             else:
 
                 # degenerate case
-                psi_1 = 0.
-                phi_1 = np.arctan2(-r[0,1], r[0,0])
+                psi_1 = 0.0
+                phi_1 = np.arctan2(-r[0, 1], r[0, 0])
 
-                phi_2 = 0.
-                psi_2 = np.arctan2(r[1,0], r[0,0])
+                phi_2 = 0.0
+                psi_2 = np.arctan2(r[1, 0], r[0, 0])
 
-        elif mode == 'test':
+        elif mode == "test":
 
-            theta_1 = np.arccos(r[2,2])
+            theta_1 = np.arccos(r[2, 2])
             theta_2 = -theta_1
 
             if theta_1 != 0:
 
                 phi_1 = np.arctan2(
-                    r[0,2] / np.sin(theta_1), -r[1,2] / np.sin(theta_1))
+                    r[0, 2] / np.sin(theta_1), -r[1, 2] / np.sin(theta_1)
+                )
                 phi_2 = np.arctan2(
-                    r[0,2] / np.sin(-theta_1), -r[1,2] / np.sin(-theta_1))
+                    r[0, 2] / np.sin(-theta_1), -r[1, 2] / np.sin(-theta_1)
+                )
 
-                psi_1 = np.arctan2(
-                    r[2,0] / np.sin(theta_1), r[2,1] / np.sin(theta_1))
+                psi_1 = np.arctan2(r[2, 0] / np.sin(theta_1), r[2, 1] / np.sin(theta_1))
                 psi_2 = np.arctan2(
-                    r[2,0] / np.sin(-theta_1), r[2,1] / np.sin(-theta_1))
+                    r[2, 0] / np.sin(-theta_1), r[2, 1] / np.sin(-theta_1)
+                )
 
             else:
 
                 # degenerate case
-                psi_1 = 0.
-                phi_1 = np.arctan2(-r[0,1], r[0,0])
+                psi_1 = 0.0
+                phi_1 = np.arctan2(-r[0, 1], r[0, 0])
 
-                phi_2 = 0.
-                psi_2 = np.arctan2(r[1,0], r[0,0])
+                phi_2 = 0.0
+                psi_2 = np.arctan2(r[1, 0], r[0, 0])
 
-        if ret == 'one':
+        if ret == "one":
             return np.array([phi_1, theta_1, psi_1])
-        elif ret == 'both':
+        elif ret == "both":
             return np.array([[phi_1, theta_1, psi_1], [phi_2, theta_2, psi_2]])
 
     @classmethod
-    def euler_to_ck(cls, angles, mode='x'):
+    def euler_to_ck(cls, angles, mode="x"):
         """
         Converts euler angles to Cayley-Klein parameters.
 
@@ -1038,31 +1203,37 @@ class Rigid3D(Affine):
         # unpack angles
         fi, theta, psi = angles
 
-        if mode == 'x':
+        if mode == "x":
 
             res = np.array(
-                [np.cos((fi + psi)/2) * np.cos(theta/2),
-                 np.cos((psi - fi)/2) * np.sin(theta/2),
-                 np.sin((psi - fi)/2) * np.sin(theta/2),
-                 np.sin((fi + psi)/2) * np.cos(theta/2)]
-                )
+                [
+                    np.cos((fi + psi) / 2) * np.cos(theta / 2),
+                    np.cos((psi - fi) / 2) * np.sin(theta / 2),
+                    np.sin((psi - fi) / 2) * np.sin(theta / 2),
+                    np.sin((fi + psi) / 2) * np.cos(theta / 2),
+                ]
+            )
 
-        elif mode == 'test':
+        elif mode == "test":
 
             res = np.array(
-                [np.cos((fi + psi)/2) * np.cos(theta/2),
-                 np.cos((fi - psi)/2) * np.sin(theta/2),
-                 np.sin((fi - psi)/2) * np.sin(theta/2),
-                 np.sin((fi + psi)/2) * np.cos(theta/2)]
-                )
+                [
+                    np.cos((fi + psi) / 2) * np.cos(theta / 2),
+                    np.cos((fi - psi) / 2) * np.sin(theta / 2),
+                    np.sin((fi - psi) / 2) * np.sin(theta / 2),
+                    np.sin((fi + psi) / 2) * np.cos(theta / 2),
+                ]
+            )
 
         else:
             raise ValueError(
-                "Mode " + mode + "is not defined. Currently implemented is "
-                + " mode 'x'")
+                "Mode "
+                + mode
+                + "is not defined. Currently implemented is "
+                + " mode 'x'"
+            )
 
         return res
-
 
     @classmethod
     def make_random_ck(cls, center=None, distance=0.1):
@@ -1097,15 +1268,13 @@ class Rigid3D(Affine):
         else:
 
             # random around initial
-            e_small_123 = (np.random.random(3) * 2. - 1) * distance
+            e_small_123 = (np.random.random(3) * 2.0 - 1) * distance
             e_small_0 = np.sqrt(1 - np.square(e_small_123).sum())
             e_small = np.hstack(([e_small_0], e_small_123))
             center = np.asarray(center)
-            r_e_random = np.dot(
-                Rigid3D.make_r_ck(center), Rigid3D.make_r_ck(e_small))
-            e_random_euler = Rigid3D.extract_euler(
-                r_e_random, mode='x', ret='one')
-            e_random = Rigid3D.euler_to_ck(e_random_euler, mode='x')
+            r_e_random = np.dot(Rigid3D.make_r_ck(center), Rigid3D.make_r_ck(e_small))
+            e_random_euler = Rigid3D.extract_euler(r_e_random, mode="x", ret="one")
+            e_random = Rigid3D.euler_to_ck(e_random_euler, mode="x")
 
         return e_random
 
@@ -1149,19 +1318,19 @@ class Rigid3D(Affine):
         if d is None:
             d = self.d
         if (d is None) or (np.isscalar(d) and (d == 0)):
-            d = np.zeros(3, dtype='int')
+            d = np.zeros(3, dtype="int")
         elif isinstance(d, (list, np.ndarray)):
             d = np.asarray(d)
         else:
             raise ValueError("Argument d: ", d, " was not understood.")
 
         # transformation
-        if xy_axes == 'point_dim':
+        if xy_axes == "point_dim":
 
             # equivalent to matrix multiplication of gl and transposed x,
             y = s * np.inner(x, q) + d
 
-        elif xy_axes == 'dim_point':
+        elif xy_axes == "dim_point":
 
             # just matrix product
             y = s * np.dot(q, x) + np.expand_dims(d, 1)
@@ -1183,34 +1352,32 @@ class Rigid3D(Affine):
         """
 
         # check shape and axes order of rotation_center
-        center = np.asarray(rotation_center, dtype='float')
+        center = np.asarray(rotation_center, dtype="float")
         shape = center.shape
         if len(shape) == 1:
-            xy_axes = 'dim'
+            xy_axes = "dim"
             center = center.reshape((shape[0], 1))
 
         elif shape[0] == 1:
-            xy_axes = 'point_dim'
+            xy_axes = "point_dim"
             center = center.reshape((shape[1], 1))
 
         elif shape[1] == 1:
-            xy_axes = 'dim_point'
+            xy_axes = "dim_point"
 
         else:
             raise ValueError("Rotation center has to be 1d, 1x3 or 3x1 array")
 
         # make new translation
-        trans = (self.transform(x=center, xy_axes='dim_point')
-                 - self.s_scalar * center)
+        trans = self.transform(x=center, xy_axes="dim_point") - self.s_scalar * center
 
         # convert to the input form
-        if xy_axes == 'dim':
+        if xy_axes == "dim":
             trans = trans.reshape(3)
-        elif xy_axes == 'point_dim':
-            trans = trans.reshape((1,3))
+        elif xy_axes == "point_dim":
+            trans = trans.reshape((1, 3))
 
         return trans
-
 
     #########################################################
     #
@@ -1231,8 +1398,8 @@ class Rigid3D(Affine):
         raise NotImplementedError("Sorry, this is still work in progress.")
 
         # convert to CM coords
-        x_cm = x - x.mean(axis=-1).reshape((3,1))
-        y_cm = y - y.mean(axis=-1).reshape((2,1))
+        x_cm = x - x.mean(axis=-1).reshape((3, 1))
+        y_cm = y - y.mean(axis=-1).reshape((2, 1))
 
         #
         def residuals(params, x=x_cm, y=y_cm, make_r=cls.make_r_euler):
@@ -1270,8 +1437,8 @@ class Rigid3D(Affine):
 
         # convert to CM coords
         if cm:
-            x_prime = x - x.mean(axis=-1).reshape((2,1))
-            y_prime = y - y.mean(axis=-1).reshape((2,1))
+            x_prime = x - x.mean(axis=-1).reshape((2, 1))
+            y_prime = y - y.mean(axis=-1).reshape((2, 1))
         else:
             x_prime = x
             y_prime = y
@@ -1286,19 +1453,23 @@ class Rigid3D(Affine):
             """
             """
 
-            r2d = r.reshape((2,3))
+            r2d = r.reshape((2, 3))
             rtr = np.dot(r2d.transpose(), r2d)
 
             # Tr(x * x_t * r_t * r)
             # perhaps (xtx * rtr).sum(), instead?
             term_1 = (
-                np.inner(xxt[0,:], rtr[:,0]) + np.inner(xxt[1,:], rtr[:,1]) +
-                np.inner(xxt[2,:], rtr[:,2]))
+                np.inner(xxt[0, :], rtr[:, 0])
+                + np.inner(xxt[1, :], rtr[:, 1])
+                + np.inner(xxt[2, :], rtr[:, 2])
+            )
 
             # Tr(x * y_t * r)
             term_2 = (
-                np.inner(xyt[0,:], r2d[:,0]) + np.inner(xyt[1,:], r2d[:,1]) +
-                np.inner(xyt[2,:], r2d[:,2]))
+                np.inner(xyt[0, :], r2d[:, 0])
+                + np.inner(xyt[1, :], r2d[:, 1])
+                + np.inner(xyt[2, :], r2d[:, 2])
+            )
 
             res = term_1 - 2 * term_2
             return res
@@ -1308,7 +1479,7 @@ class Rigid3D(Affine):
             """
             """
 
-            r2d = r.reshape((2,3))
+            r2d = r.reshape((2, 3))
 
             # r * x * x_t - 2 * y * x_t
             res2d = np.dot(r2d, xxt) - 2 * yxt
@@ -1318,29 +1489,36 @@ class Rigid3D(Affine):
 
         # orthogonality constraint
         ortho = (
-            {'type' : 'eq',
-             'fun' : lambda r: np.array([r[0]**2 + r[1]**2 + r[2]**2 -1]),
-             'jac' : lambda r: np.array([2*r[0], 2*r[1], 2*r[2], 0, 0, 0])},
-            {'type' : 'eq',
-             'fun' : lambda r: np.array([r[3]**2 + r[4]**2 + r[5]**2 -1]),
-             'jac' : lambda r: np.array([2*r[0], 2*r[1], 2*r[2], 0, 0, 0])},
-            {'type' : 'eq',
-             'fun' : lambda r: np.array([r[0]*r[3] + r[1]*r[4] + r[2]*r[5]]),
-             'jac' : lambda r: np.array([r[3], r[4], r[5], r[0], r[1], r[2]])})
+            {
+                "type": "eq",
+                "fun": lambda r: np.array([r[0] ** 2 + r[1] ** 2 + r[2] ** 2 - 1]),
+                "jac": lambda r: np.array([2 * r[0], 2 * r[1], 2 * r[2], 0, 0, 0]),
+            },
+            {
+                "type": "eq",
+                "fun": lambda r: np.array([r[3] ** 2 + r[4] ** 2 + r[5] ** 2 - 1]),
+                "jac": lambda r: np.array([2 * r[0], 2 * r[1], 2 * r[2], 0, 0, 0]),
+            },
+            {
+                "type": "eq",
+                "fun": lambda r: np.array([r[0] * r[3] + r[1] * r[4] + r[2] * r[5]]),
+                "jac": lambda r: np.array([r[3], r[4], r[5], r[0], r[1], r[2]]),
+            },
+        )
 
         # use identity rotaion if initial not specified
         if init is None:
-            init = np.array([1,0,0,0,1,0])
+            init = np.array([1, 0, 0, 0, 1, 0])
 
         # solve
         res = sp.optimize.minimize(
-            sq_diff, init, jac=sq_diff_deriv, constraints=ortho,
-            options={'disp': True})
+            sq_diff, init, jac=sq_diff_deriv, constraints=ortho, options={"disp": True}
+        )
 
         return res
 
     @classmethod
-    def _find_22_constr(cls, x, y, init=None, cm=True, mode='fi'):
+    def _find_22_constr(cls, x, y, init=None, cm=True, mode="fi"):
         """
         Mode 'r' doesn't work (singular matrix in LSQ)
         """
@@ -1348,8 +1526,8 @@ class Rigid3D(Affine):
 
         # convert to CM coords
         if cm:
-            x_prime = x - x.mean(axis=-1).reshape((2,1))
-            y_prime = y - y.mean(axis=-1).reshape((2,1))
+            x_prime = x - x.mean(axis=-1).reshape((2, 1))
+            y_prime = y - y.mean(axis=-1).reshape((2, 1))
         else:
             x_prime = x
             y_prime = y
@@ -1381,21 +1559,23 @@ class Rigid3D(Affine):
             """
 
             # -2 * [Tr(xty), -xyt[0,1] + xyt[1,0]]
-            res = np.array([-2 * (xyt[0,0] + xyt[1,1]),
-                            -2 * (-xyt[0,1] + xyt[1,0])])
+            res = np.array(
+                [-2 * (xyt[0, 0] + xyt[1, 1]), -2 * (-xyt[0, 1] + xyt[1, 0])]
+            )
             return res
 
         # constraint cfi**2 + sfi**2 = 1
-        cons_cfi_sfi = (
-            {'type' : 'eq',
-             'fun' : lambda par: np.array([par[0]**2 + par[1]**2 - 1]),
-             'jac' : lambda par: np.array([2 * par[0], 2 * par[1]])})
+        cons_cfi_sfi = {
+            "type": "eq",
+            "fun": lambda par: np.array([par[0] ** 2 + par[1] ** 2 - 1]),
+            "jac": lambda par: np.array([2 * par[0], 2 * par[1]]),
+        }
 
         def sq_diff_r(param, xyt=xyt, const=sq_diff_const):
             """
             """
 
-            r2d = param.reshape((2,2))
+            r2d = param.reshape((2, 2))
 
             # -2 * Tr(x y_t r) = -2 * (y x_t) * r
             res = const - 2 * (xyt * r2d).sum()
@@ -1410,46 +1590,63 @@ class Rigid3D(Affine):
             return res
 
         cons_r = (
-            {'type' : 'eq',
-             'fun' : lambda par: np.array([par[0]**2 + par[1]**2 - 1]),
-             'jac' : lambda par: np.array([2 * par[0], 2 * par[1], 0, 0])},
-            {'type' : 'eq',
-             'fun' : lambda par: np.array([par[2]**2 + par[3]**2 - 1]),
-             'jac' : lambda par: np.array([0, 0, 2 * par[2], 2 * par[2]])},
-            {'type' : 'eq',
-             'fun' : lambda par: np.array([par[0]*par[2] + par[1]*par[3]]),
-             'jac' : lambda par: np.array([par[2], par[3], par[0], par[1]])},
-            {'type' : 'eq',
-             'fun' : lambda par: np.array([par[0]*par[3] - par[1]*par[2] - 1]),
-             'jac' : lambda par: np.array([par[3], par[2], par[1], par[0]])}
-            )
+            {
+                "type": "eq",
+                "fun": lambda par: np.array([par[0] ** 2 + par[1] ** 2 - 1]),
+                "jac": lambda par: np.array([2 * par[0], 2 * par[1], 0, 0]),
+            },
+            {
+                "type": "eq",
+                "fun": lambda par: np.array([par[2] ** 2 + par[3] ** 2 - 1]),
+                "jac": lambda par: np.array([0, 0, 2 * par[2], 2 * par[2]]),
+            },
+            {
+                "type": "eq",
+                "fun": lambda par: np.array([par[0] * par[2] + par[1] * par[3]]),
+                "jac": lambda par: np.array([par[2], par[3], par[0], par[1]]),
+            },
+            {
+                "type": "eq",
+                "fun": lambda par: np.array([par[0] * par[3] - par[1] * par[2] - 1]),
+                "jac": lambda par: np.array([par[3], par[2], par[1], par[0]]),
+            },
+        )
 
         # solve
-        if mode == 'fi':
+        if mode == "fi":
 
             # init
             if init is None:
-                init = np.array([1, 0.])
+                init = np.array([1, 0.0])
 
             res = sp.optimize.minimize(
-                sq_diff_cfi_sfi, init, jac=sq_diff_cfi_sfi_deriv,
-                constraints=cons_cfi_sfi, options={'disp': True})
+                sq_diff_cfi_sfi,
+                init,
+                jac=sq_diff_cfi_sfi_deriv,
+                constraints=cons_cfi_sfi,
+                options={"disp": True},
+            )
 
-        elif mode == 'r':
+        elif mode == "r":
 
             # init
             if init is None:
-                init = np.array([1, 0., 0, 1])
+                init = np.array([1, 0.0, 0, 1])
 
             res = sp.optimize.minimize(
-                sq_diff_r, init, jac=sq_diff_r_deriv,
-                constraints=cons_r, options={'disp': True})
+                sq_diff_r,
+                init,
+                jac=sq_diff_r_deriv,
+                constraints=cons_r,
+                options={"disp": True},
+            )
 
         return res
 
     @classmethod
     def _find_32_constr_ck_33(
-            cls, x, y, init=None, cm=True, use_jac=True, maxiter=1000):
+        cls, x, y, init=None, cm=True, use_jac=True, maxiter=1000
+    ):
         """
         Doesn't always work
         """
@@ -1457,24 +1654,25 @@ class Rigid3D(Affine):
 
         # convert to CM coords
         if cm:
-            x_prime = x - x.mean(axis=-1).reshape((3,1))
-            y_prime = y - y.mean(axis=-1).reshape((2,1))
+            x_prime = x - x.mean(axis=-1).reshape((3, 1))
+            y_prime = y - y.mean(axis=-1).reshape((2, 1))
         else:
             x_prime = x
             y_prime = y
 
         # coordinates
-        #xyt = np.dot(x_prime, y_prime.transpose())
-        #yxt = np.dot(y_prime, x_prime.transpose())
+        # xyt = np.dot(x_prime, y_prime.transpose())
+        # yxt = np.dot(y_prime, x_prime.transpose())
 
         # not necessary, just to have correct min value
         trxx = (x_prime * x_prime).sum()
-        #try2 = (y_prime * y_prime).sum()
-        #sq_diff_const = trx2 + try2
+        # try2 = (y_prime * y_prime).sum()
+        # sq_diff_const = trx2 + try2
 
         # function to minimize
         def sq_diff_ck_33(
-                param, x=x_prime, y=y_prime, make_r=cls.make_r_ck, const=trxx):
+            param, x=x_prime, y=y_prime, make_r=cls.make_r_ck, const=trxx
+        ):
             """
             """
 
@@ -1486,7 +1684,7 @@ class Rigid3D(Affine):
             y_3n = np.vstack([y, y3])
 
             # make r
-            #r = np.array(
+            # r = np.array(
             #    [[e0**2 + e1**2 - e2**2 - e3**2,
             #      2 * (e1*e2 + e0*e3), 2 * (e1*e3 - e0*e2)],
             #     [2 * (e1*e2 - e0*e3), e0**2 - e1**2 + e2**2 - e3**2,
@@ -1502,8 +1700,12 @@ class Rigid3D(Affine):
             return res
 
         def sq_diff_ck_33_deriv(
-                param, x=x_prime, y=y_prime, make_r=cls.make_r_ck,
-                make_r_deriv=cls.make_r_ck_deriv):
+            param,
+            x=x_prime,
+            y=y_prime,
+            make_r=cls.make_r_ck,
+            make_r_deriv=cls.make_r_ck_deriv,
+        ):
             """
             """
 
@@ -1518,7 +1720,7 @@ class Rigid3D(Affine):
             yxt = np.dot(y_3n, x.transpose())
 
             # make r
-            #r = np.array(
+            # r = np.array(
             #    [[e0**2 + e1**2 - e2**2 - e3**2,
             #      2 * (e1*e2 + e0*e3), 2 * (e1*e3 - e0*e2)],
             #     [2 * (e1*e2 - e0*e3), e0**2 - e1**2 + e2**2 - e3**2,
@@ -1528,13 +1730,13 @@ class Rigid3D(Affine):
             r = make_r([e0, e1, e2, e3])
 
             # dr / de
-            #dr_de0 = 2 * np.array(
+            # dr_de0 = 2 * np.array(
             #    [[e0, e3, -e2], [-e3, e0, e1], [e2, -e1, e0]])
-            #dr_de1 = 2 * np.array(
+            # dr_de1 = 2 * np.array(
             #    [[e1, e2, e3], [e2, -e1, e0], [e3, -e0, -e1]])
-            #dr_de2 = 2 * np.array(
+            # dr_de2 = 2 * np.array(
             #    [[-e2, e1, -e0], [e1, e2, e3], [e0, e3, -e2]])
-            #dr_de3 = np.array(
+            # dr_de3 = np.array(
             #    [[-e3, e0, e1], [-e0, -e3, e2], [e1, e2, e3]])
             dr_de0, dr_de1, dr_de2, dr_de3 = make_r_deriv([e0, e1, e2, e3])
 
@@ -1545,8 +1747,8 @@ class Rigid3D(Affine):
             d_de3 = -2 * (yxt * dr_de3).sum()
 
             # d / dy3
-            rx3 = np.dot(r[2,:], x)
-            d_dy3 = 2 * (y_3n[2,:] - rx3)
+            rx3 = np.dot(r[2, :], x)
+            d_dy3 = 2 * (y_3n[2, :] - rx3)
 
             # together
             res = np.hstack(([d_de0, d_de1, d_de2, d_de3], d_dy3))
@@ -1559,29 +1761,39 @@ class Rigid3D(Affine):
             res = np.zeros_like(param)
             res[i] = -1
             return res
+
         constr_ck_norm = (
-            {'type' : 'eq',
-             'fun' : lambda par: np.array([(par[:4]**2).sum() - 1]),
-             'jac' : lambda par: 2 * np.hstack(
-                 [par[:4], np.zeros(len(par) - 4)])},
-            {'type' : 'ineq',
-            'fun' : lambda par: np.array(1 - par[0]),
-            'jac' : partial(constr_jac, i=0)},
-             {'type' : 'ineq',
-              'fun' : lambda par: np.array(1 - par[1]),
-              'jac' : partial(constr_jac, i=1)},
-             {'type' : 'ineq',
-              'fun' : lambda par: np.array(1 - par[2]),
-              'jac' : partial(constr_jac, i=2)},
-            {'type' : 'ineq',
-             'fun' : lambda par: np.array(1 - par[3]),
-             'jac' : partial(constr_jac, i=3)}
-            )
+            {
+                "type": "eq",
+                "fun": lambda par: np.array([(par[:4] ** 2).sum() - 1]),
+                "jac": lambda par: 2 * np.hstack([par[:4], np.zeros(len(par) - 4)]),
+            },
+            {
+                "type": "ineq",
+                "fun": lambda par: np.array(1 - par[0]),
+                "jac": partial(constr_jac, i=0),
+            },
+            {
+                "type": "ineq",
+                "fun": lambda par: np.array(1 - par[1]),
+                "jac": partial(constr_jac, i=1),
+            },
+            {
+                "type": "ineq",
+                "fun": lambda par: np.array(1 - par[2]),
+                "jac": partial(constr_jac, i=2),
+            },
+            {
+                "type": "ineq",
+                "fun": lambda par: np.array(1 - par[3]),
+                "jac": partial(constr_jac, i=3),
+            },
+        )
 
         # init: [1, 0, 0, ...]
         if init is None:
             init = np.zeros(4 + y_prime.shape[1])
-            init[0] = 1.
+            init[0] = 1.0
 
         # jacobian
         if use_jac:
@@ -1591,7 +1803,11 @@ class Rigid3D(Affine):
 
         # solve
         res = sp.optimize.minimize(
-            sq_diff_ck_33, init, jac=jac, constraints=constr_ck_norm,
-            options={'disp': True, 'maxiter' : maxiter})
+            sq_diff_ck_33,
+            init,
+            jac=jac,
+            constraints=constr_ck_norm,
+            options={"disp": True, "maxiter": maxiter},
+        )
 
         return res

@@ -4,20 +4,20 @@
 
 
 # @Title            : test_TDCT_correlation
-# @Project            : 3DCTv2
-# @Description        : pytest test
-# @Author            : Jan Arnold
+# @Project          : 3DCTv2
+# @Description      : pytest test
+# @Author           : Jan Arnold
 # @Email            : jan.arnold (at) coraxx.net
 # @Copyright        : Copyright (C) 2016  Jan Arnold
-# @License            : GPLv3 (see LICENSE file)
-# @Credits            :
-# @Maintainer        : Jan Arnold
-# @Date                : 2016/04
-# @Version            : 3DCT 2.3.0 module rev. 3
-# @Status            : stable
+# @License          : GPLv3 (see LICENSE file)
+# @Credits          :
+# @Maintainer       : Jan Arnold
+# @Date             : 2016/04
+# @Version          : 3DCT 2.3.0 module rev. 3
+# @Status           : stable
 # @Usage            : pytest
 # @Notes            :
-# @Python_version    : 2.7.11
+# @Python_version   : 2.7.11
 """
 # ======================================================================================================================#
 import pytest
@@ -26,6 +26,7 @@ import tifffile as tf
 
 try:
     import TDCT_correlation
+
     TDCT_error = ""
     TDCT_correlation.debug = False
 except Exception as e:
@@ -42,21 +43,22 @@ def test_imgShapeGrey(image_Grey):
     assert img.shape == (941, 1024)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def tdct_CorrelationInstance_setup(request, image_RGB):
     def tdct_CorrelationInstance_teardown():
-        print('\ndone using TDCT_correlation instance')
+        print("\ndone using TDCT_correlation instance")
+
     request.addfinalizer(tdct_CorrelationInstance_teardown)
 
-    print('\nsetting up TDCT_correlation instance')
+    print("\nsetting up TDCT_correlation instance")
     left = str(image_RGB)
     right = str(image_RGB)
-    main = TDCT_correlation.Main(leftImage=left,rightImage=right)
+    main = TDCT_correlation.Main(leftImage=left, rightImage=right)
     return main
 
 
 def test_TDCT_correlationImport():
-    if 'TDCT_correlation' not in globals():
+    if "TDCT_correlation" not in globals():
         pytest.fail("TDCT_correlation import: {0}".format(TDCT_error))
 
 
@@ -66,86 +68,127 @@ def test_TDCT_correlationImport():
 #     assert window
 
 
-@pytest.mark.skipif(TDCT_error != "", reason="TDCT_correlation import failed: {0}".format(TDCT_error))
+@pytest.mark.skipif(
+    TDCT_error != "", reason="TDCT_correlation import failed: {0}".format(TDCT_error)
+)
 def test_guiFile(maindir):
     qtCreatorFile_main = os.path.join(maindir, "TDCT_correlation.ui")
     assert os.path.isfile(qtCreatorFile_main) is True
-    Ui_MainWindow, QtBaseClass = TDCT_correlation.uic.loadUiType(qtCreatorFile_main)
+    Ui_MainWindow, QtBaseClass = TDCT_correlation.uic.loadUiType(
+        qtCreatorFile_main)
     assert Ui_MainWindow
     assert QtBaseClass
 
 
-@pytest.mark.skipif(TDCT_error != "", reason="TDCT_correlation import failed: {0}".format(TDCT_error))
+@pytest.mark.skipif(
+    TDCT_error != "", reason="TDCT_correlation import failed: {0}".format(TDCT_error)
+)
 def test_model2np(tdct_CorrelationInstance_setup):
     # print(dir(tdct_CorrelationInstance_setup.window))
-    compArray = TDCT_correlation.np.array([
-        [0., 0., 0.],
-        [50., 25., 5.],
-        [100., 50., 10.],
-        [150., 75., 15.],
-        [200., 100., 20.]])
+    compArray = TDCT_correlation.np.array(
+        [
+            [0.0, 0.0, 0.0],
+            [50.0, 25.0, 5.0],
+            [100.0, 50.0, 10.0],
+            [150.0, 75.0, 15.0],
+            [200.0, 100.0, 20.0],
+        ]
+    )
     for i in range(5):
         items = [
-            TDCT_correlation.QtGui.QStandardItem(str(50*i)),
-            TDCT_correlation.QtGui.QStandardItem(str(25*i)),
-            TDCT_correlation.QtGui.QStandardItem(str(5*i))]
+            TDCT_correlation.QtGui.QStandardItem(str(50 * i)),
+            TDCT_correlation.QtGui.QStandardItem(str(25 * i)),
+            TDCT_correlation.QtGui.QStandardItem(str(5 * i)),
+        ]
         tdct_CorrelationInstance_setup.window.modelRight.appendRow(items)
-    retArray = tdct_CorrelationInstance_setup.window.model2np(tdct_CorrelationInstance_setup.window.modelRight,[0,5])
+    retArray = tdct_CorrelationInstance_setup.window.model2np(
+        tdct_CorrelationInstance_setup.window.modelRight, [0, 5]
+    )
     # assert TDCT_correlation.np.array_equal(retArray, compArray)
-    assert TDCT_correlation.np.testing.assert_array_equal(retArray, compArray) is None
+    assert TDCT_correlation.np.testing.assert_array_equal(
+        retArray, compArray) is None
 
 
-@pytest.mark.skipif(TDCT_error != "", reason="TDCT_correlation import failed: {0}".format(TDCT_error))
+@pytest.mark.skipif(
+    TDCT_error != "", reason="TDCT_correlation import failed: {0}".format(TDCT_error)
+)
 def test_anglectrl(tdct_CorrelationInstance_setup):
-    testArray = {-1:359,0:0,1:1,359:359,360:0,361:1}
-    for k,v in testArray.items():
-        print("Testing angle {0:03}, expecting {1:03} ... ".format(k, v), end=' ')
+    testArray = {-1: 359, 0: 0, 1: 1, 359: 359, 360: 0, 361: 1}
+    for k, v in testArray.items():
+        print("Testing angle {0:03}, expecting {1:03} ... ".format(
+            k, v), end=" ")
         angle = tdct_CorrelationInstance_setup.window.anglectrl(angle=k)
         assert angle == v
         print("OK")
 
 
-@pytest.mark.skipif(TDCT_error != "", reason="TDCT_correlation import failed: {0}".format(TDCT_error))
+@pytest.mark.skipif(
+    TDCT_error != "", reason="TDCT_correlation import failed: {0}".format(TDCT_error)
+)
 def test_pxSize(tdct_CorrelationInstance_setup, image_RGB, image_Grey):
-    pixelSize = tdct_CorrelationInstance_setup.window.pxSize(str(image_RGB),z=False)
-    assert pixelSize == 123.
-    pixelSize = tdct_CorrelationInstance_setup.window.pxSize(str(image_Grey),z=False)
-    assert pixelSize == 4.56e-006*1e006
-    pixelSize = tdct_CorrelationInstance_setup.window.pxSize(str(image_RGB),z=True)
-    assert pixelSize == 456.
-    pixelSize = tdct_CorrelationInstance_setup.window.pxSize(str(image_Grey),z=True)
-    assert pixelSize == 123.
+    pixelSize = tdct_CorrelationInstance_setup.window.pxSize(
+        str(image_RGB), z=False)
+    assert pixelSize == 123.0
+    pixelSize = tdct_CorrelationInstance_setup.window.pxSize(
+        str(image_Grey), z=False)
+    assert pixelSize == 4.56e-006 * 1e006
+    pixelSize = tdct_CorrelationInstance_setup.window.pxSize(
+        str(image_RGB), z=True)
+    assert pixelSize == 456.0
+    pixelSize = tdct_CorrelationInstance_setup.window.pxSize(
+        str(image_Grey), z=True)
+    assert pixelSize == 123.0
 
 
-@pytest.mark.skipif(TDCT_error != "", reason="TDCT_correlation import failed: {0}".format(TDCT_error))
+@pytest.mark.skipif(
+    TDCT_error != "", reason="TDCT_correlation import failed: {0}".format(TDCT_error)
+)
 def test_norm_img(tdct_CorrelationInstance_setup):
-    compArray = TDCT_correlation.np.array([[127, 127, 127],[254, 254, 254]], dtype='uint8')
-    retArray = tdct_CorrelationInstance_setup.window.norm_img(TDCT_correlation.np.array([[1,1,1],[2,2,2]],dtype='uint8'))
-    assert TDCT_correlation.np.testing.assert_array_equal(retArray, compArray) is None
+    compArray = TDCT_correlation.np.array(
+        [[127, 127, 127], [254, 254, 254]], dtype="uint8"
+    )
+    retArray = tdct_CorrelationInstance_setup.window.norm_img(
+        TDCT_correlation.np.array([[1, 1, 1], [2, 2, 2]], dtype="uint8")
+    )
+    assert TDCT_correlation.np.testing.assert_array_equal(
+        retArray, compArray) is None
 
 
-@pytest.mark.skipif(TDCT_error != "", reason="TDCT_correlation import failed: {0}".format(TDCT_error))
+@pytest.mark.skipif(
+    TDCT_error != "", reason="TDCT_correlation import failed: {0}".format(TDCT_error)
+)
 def test_blendImages(tdct_CorrelationInstance_setup):
-    ## Blending images
-    img1 = TDCT_correlation.np.array([[1,1],[2,2]],dtype='uint8')
-    img2 = TDCT_correlation.np.array([[3,4],[4,4]],dtype='uint8')
+    # Blending images
+    img1 = TDCT_correlation.np.array([[1, 1], [2, 2]], dtype="uint8")
+    img2 = TDCT_correlation.np.array([[3, 4], [4, 4]], dtype="uint8")
 
-    ## Blending using "screen"
-    compArray = TDCT_correlation.np.array([[3,4],[5,5]], dtype='uint8')
-    retArray = tdct_CorrelationInstance_setup.window.blendImages([img1,img2], blendmode='screen')
-    assert TDCT_correlation.np.testing.assert_array_equal(retArray, compArray) is None
+    # Blending using "screen"
+    compArray = TDCT_correlation.np.array([[3, 4], [5, 5]], dtype="uint8")
+    retArray = tdct_CorrelationInstance_setup.window.blendImages(
+        [img1, img2], blendmode="screen"
+    )
+    assert TDCT_correlation.np.testing.assert_array_equal(
+        retArray, compArray) is None
 
-    ## Blending using "minimum"
-    compArray = TDCT_correlation.np.array([[1,1],[2,2]], dtype='uint8')
-    retArray = tdct_CorrelationInstance_setup.window.blendImages([img1,img2], blendmode='minimum')
-    assert TDCT_correlation.np.testing.assert_array_equal(retArray, compArray) is None
+    # Blending using "minimum"
+    compArray = TDCT_correlation.np.array([[1, 1], [2, 2]], dtype="uint8")
+    retArray = tdct_CorrelationInstance_setup.window.blendImages(
+        [img1, img2], blendmode="minimum"
+    )
+    assert TDCT_correlation.np.testing.assert_array_equal(
+        retArray, compArray) is None
 
-    ## Passing no images should return a "white image" i.e. array with all pixels = 255
-    compArray = TDCT_correlation.np.zeros([10,10], dtype='uint8')-1
-    retArray = tdct_CorrelationInstance_setup.window.blendImages([], blendmode='screen')
-    assert TDCT_correlation.np.testing.assert_array_equal(retArray, compArray) is None
-    retArray = tdct_CorrelationInstance_setup.window.blendImages([], blendmode='minimum')
-    assert TDCT_correlation.np.testing.assert_array_equal(retArray, compArray) is None
+    # Passing no images should return a "white image" i.e. array with all pixels = 255
+    compArray = TDCT_correlation.np.zeros([10, 10], dtype="uint8") - 1
+    retArray = tdct_CorrelationInstance_setup.window.blendImages(
+        [], blendmode="screen")
+    assert TDCT_correlation.np.testing.assert_array_equal(
+        retArray, compArray) is None
+    retArray = tdct_CorrelationInstance_setup.window.blendImages(
+        [], blendmode="minimum"
+    )
+    assert TDCT_correlation.np.testing.assert_array_equal(
+        retArray, compArray) is None
 
 
 # @pytest.fixture(scope='module')

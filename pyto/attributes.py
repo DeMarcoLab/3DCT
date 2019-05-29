@@ -21,7 +21,7 @@ def getattr_deep(object, name):
 
     # split name in attributes (list)
     if isinstance(name, str):
-        attributes = name.split('.')
+        attributes = name.split(".")
     else:
         attributes = name
 
@@ -32,7 +32,7 @@ def getattr_deep(object, name):
     return object
 
 
-def setattr_deep(object, name, value, mode='_'):
+def setattr_deep(object, name, value, mode="_"):
     """
     Like built-in setattr, but if name contains dots it is changed according
     to the mode. If mode is '_' dots are replaced by underscores, and if it
@@ -48,7 +48,7 @@ def setattr_deep(object, name, value, mode='_'):
     setattr(object, name, value)
 
 
-def get_deep_name(name, mode='_'):
+def get_deep_name(name, mode="_"):
     """
     Returns name transformed by mode. If mode is '_' dots in name are
     replaced by underscores, and if it is 'last', only the part after the
@@ -59,11 +59,11 @@ def get_deep_name(name, mode='_'):
       - mode: determines how a name containing dots is transformed
     """
 
-    if mode == '_':
-        name = name.replace('.', '_')
+    if mode == "_":
+        name = name.replace(".", "_")
 
-    elif mode == 'last':
-        attributes = name.split('.')
+    elif mode == "last":
+        attributes = name.split(".")
         name = attributes.pop()
 
     else:

@@ -6,21 +6,21 @@ Rotate original light microscope volume with tom_rotate function in MATLAB.
 This generates the MATLAB script and runs in the matlab -nodisplay console.
 
 # @Title            : matlab3Drotation
-# @Project            : 3DCTv2
-# @Description        : Rotate original light microscope volume
-# @Author            : Jan Arnold
+# @Project          : 3DCTv2
+# @Description      : Rotate original light microscope volume
+# @Author           : Jan Arnold
 # @Email            : jan.arnold (at) coraxx.net
 # @Copyright        : Copyright (C) 2016  Jan Arnold
-# @License            : GPLv3 (see LICENSE file)
-# @Credits            : Florian Beck, Max-Planck-Institute of Biochemistry
-# @Maintainer        : Jan Arnold
-# @Date                : 2016/01
-# @Version            : 3DCT 2.3.0 module rev. 1
-# @Status            : development
+# @License          : GPLv3 (see LICENSE file)
+# @Credits          : Florian Beck, Max-Planck-Institute of Biochemistry
+# @Maintainer       : Jan Arnold
+# @Date             : 2016/01
+# @Version          : 3DCT 2.3.0 module rev. 1
+# @Status           : development
 # @Usage            : Meant to be imported, i.e. import matlab3Drotation.py and used with calling
-#                     : matlab_rotate(img_vol,)
+#                   : matlab_rotate(img_vol,)
 # @Notes            :
-# @Python_version    : 2.7.11
+# @Python_version   : 2.7.11
 """
 # ======================================================================================================================
 
@@ -33,14 +33,14 @@ except Exception as e:
     print(e)
     sys.exit()
 
-filein = 'S1G2_40x_area1_1_resliced.raw'
-dtype = 'uint16'
-endiantype = 'be'
+filein = "S1G2_40x_area1_1_resliced.raw"
+dtype = "uint16"
+endiantype = "be"
 dimensions_x = 1344
 dimensions_y = 1024
 dimensions_z = 123
 
-fileout = 'S1G2_40x_area1_0_resliced'
+fileout = "S1G2_40x_area1_0_resliced"
 
 eul1_phi = -59.561
 eul1_psi = 179.763
@@ -61,17 +61,17 @@ lam_end_x = 885
 lam_start_y = 512
 lam_end_y = 518
 
-binning = 'false'
+binning = "false"
 binfactor = 0
-showfig = 'true'
-savevolrot = 'false'
-cutoutlamella = 'true'
+showfig = "true"
+savevolrot = "false"
+cutoutlamella = "true"
 
 
 def genMatlabScript():
     # Generate Matlab script
     format_args = [
-        filein,                    # {0} = 'str'  file path to raw volume
+        filein,  # {0} = 'str'  file path to raw volume
         # {1} = 'str'  dtype, probably 'int16' or 'uint16'
         dtype,
         # {2} = 'str'  endian type, probably le except when saving raw with FIJI (be by default)
@@ -90,9 +90,9 @@ def genMatlabScript():
         eul1_psi,
         # {9} = 'int'  correlated rotation angle e.g. FIB: theta
         eul1_theta,
-        scale1,                    # {10} = 'int'  scaling factor e.g. FIB
-        shifty1,                # {11} = 'int'  shift in y e.g. FIB
-        shiftx1,                # {12} = 'int'  shift in x e.g. FIB
+        scale1,  # {10} = 'int'  scaling factor e.g. FIB
+        shifty1,  # {11} = 'int'  shift in y e.g. FIB
+        shiftx1,  # {12} = 'int'  shift in x e.g. FIB
         # {13} = 'int'  second correlated rotation angle e.g. SEM: phi
         eul2_phi,
         # {14} = 'int'  second correlated rotation angle e.g. SEM: psi
@@ -101,8 +101,8 @@ def genMatlabScript():
         eul2_theta,
         # {16} = 'int'  second scaling factor e.g. SEM
         scale2,
-        shifty2,                # {17} = 'int'  second shift in y e.g. SEM
-        shiftx2,                # {18} = 'int'  second shift in x e.g. SEM
+        shifty2,  # {17} = 'int'  second shift in y e.g. SEM
+        shiftx2,  # {18} = 'int'  second shift in x e.g. SEM
         # +1 because matlab is not counting zero-based
         # {19} = 'int'  lamella start x coordinate    (1)        1/3----------------2/3
         lam_start_x + 1,
@@ -112,16 +112,16 @@ def genMatlabScript():
         lam_start_y + 1,
         # {22} = 'int'  lamella end y coordinate        (4)        1/4----------------2/4
         lam_end_y + 1,
-        binning,                # {23} = 'str'  binning true or false
+        binning,  # {23} = 'str'  binning true or false
         # {24} = 'int'  binning factor, e.g. 1 for one time binning
         binfactor,
-        showfig,                # {25} = 'str'  showfig true or false
-        savevolrot,                # {26} = 'str'  savevolrot true or false
+        showfig,  # {25} = 'str'  showfig true or false
+        savevolrot,  # {26} = 'str'  savevolrot true or false
         # {27} = 'str'  cut out lamella part from LM data true or false
         cutoutlamella,
     ]
 
-    script_template = '''
+    script_template = """
 function exitcode = rotate_script()
 
 %% Variables
@@ -270,7 +270,7 @@ volout = tom_paste(single(qvol),volin,[round((max(size(qvol))-size(volin,1))/2) 
                                round((max(size(qvol))-size(volin,2))/2) ...
                                round((max(size(qvol))-size(volin,3))/2)]);
 end
-'''
+"""
     return script_template.format(*format_args)
 
 

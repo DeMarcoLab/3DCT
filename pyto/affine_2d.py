@@ -17,6 +17,7 @@ import scipy.linalg as linalg
 from .points import Points
 from .affine import Affine
 
+
 class Affine2D(Affine):
     """
     Finds and preforms affine transformation (general linear transformation
@@ -54,8 +55,17 @@ class Affine2D(Affine):
       - rmsError: root mean square error of the transformation
     """
 
-    def __init__(self, d=None, gl=None, phi=None, scale=None,
-                 parity=1, shear=0, order='qpsm', xy_axes='point_dim'):
+    def __init__(
+        self,
+        d=None,
+        gl=None,
+        phi=None,
+        scale=None,
+        parity=1,
+        shear=0,
+        order="qpsm",
+        xy_axes="point_dim",
+    ):
         """
         Initialization. Following argument combinations are valid:
           - no arguments: no transformation matrices are initialized
@@ -89,8 +99,7 @@ class Affine2D(Affine):
             d = self.makeD(d)
 
         if (gl is not None) and (d is not None):
-            super(self.__class__, self).__init__(
-                gl, d, order=order, xy_axes=xy_axes)
+            super(self.__class__, self).__init__(gl, d, order=order, xy_axes=xy_axes)
 
         elif (phi is not None) and (scale is not None) and (d is not None):
 
@@ -104,13 +113,14 @@ class Affine2D(Affine):
             qp = numpy.inner(self.makeQ(phi), self.makeP(parity))
             sm = numpy.inner(scale, self.makeM(shear))
             gl = numpy.inner(qp, sm)
-            super(self.__class__, self).__init__(
-                gl, d, order=order, xy_axes=xy_axes)
+            super(self.__class__, self).__init__(gl, d, order=order, xy_axes=xy_axes)
 
         else:
 
-            raise ValueError("Transformation could not be created because "
-                             + " not enough parameters were specified.")
+            raise ValueError(
+                "Transformation could not be created because "
+                + " not enough parameters were specified."
+            )
 
     @classmethod
     def downcast(cls, affine):
@@ -126,8 +136,20 @@ class Affine2D(Affine):
         new = cls(gl=affine.gl, d=affine.d, xy_axes=affine.xy_axes)
 
         # copy attributes that are not obligarory
-        for name in ['order', 'resids', 'rank', 'singular', 'error', '_xPrime',
-                     '_yPrime', 'q', 'p', 's', 'm', 'xy_axes']:
+        for name in [
+            "order",
+            "resids",
+            "rank",
+            "singular",
+            "error",
+            "_xPrime",
+            "_yPrime",
+            "q",
+            "p",
+            "s",
+            "m",
+            "xy_axes",
+        ]:
             try:
                 value = getattr(affine, name)
                 setattr(new, name, value)
@@ -158,8 +180,9 @@ class Affine2D(Affine):
         """
         Returns rotation matrix corresponding to angle phi
         """
-        q = numpy.array([[numpy.cos(phi), -numpy.sin(phi)],
-                         [numpy.sin(phi), numpy.cos(phi)]])
+        q = numpy.array(
+            [[numpy.cos(phi), -numpy.sin(phi)], [numpy.sin(phi), numpy.cos(phi)]]
+        )
         return q
 
     @classmethod
@@ -168,7 +191,7 @@ class Affine2D(Affine):
         Returns angle corresponding to the rotation matrix specified by arg q
         """
 
-        res = numpy.arctan2(q[1,0], q[0,0])
+        res = numpy.arctan2(q[1, 0], q[0, 0])
         return res
 
     @classmethod
@@ -205,8 +228,7 @@ class Affine2D(Affine):
         """
         Returns share matrix corresponding to (arg) shear.
         """
-        m = numpy.array([[1, shear],
-                         [0, 1]])
+        m = numpy.array([[1, shear], [0, 1]])
         return m
 
     @classmethod
@@ -225,11 +247,11 @@ class Affine2D(Affine):
         """
         Rotation angle of matrix self.q in radians.
         """
-        #try:
+        # try:
         #    qq = self.q
-        #except AttributeError:
+        # except AttributeError:
         #    self.decompose(order='qpsm')
-        res = numpy.arctan2(self.q[1,0], self.q[0,0])
+        res = numpy.arctan2(self.q[1, 0], self.q[0, 0])
         return res
 
     def setPhi(self, phi):
@@ -244,7 +266,7 @@ class Affine2D(Affine):
         except AttributeError:
             pass
 
-    phi = property(fget=getPhi, fset=setPhi, doc='Rotation angle in radians')
+    phi = property(fget=getPhi, fset=setPhi, doc="Rotation angle in radians")
 
     def getPhiDeg(self):
         """
@@ -265,8 +287,8 @@ class Affine2D(Affine):
             self.gl = self.composeGl()
         except AttributeError:
             pass
-    phiDeg = property(fget=getPhiDeg, fset=setPhiDeg,
-                      doc='Rotation angle in degrees')
+
+    phiDeg = property(fget=getPhiDeg, fset=setPhiDeg, doc="Rotation angle in degrees")
 
     def getUAngle(self):
         """
@@ -281,14 +303,17 @@ class Affine2D(Affine):
         self.u = self.makeQ(angle)
         self.gl = self.composeGl()
 
-    uAngle = property(fget=getUAngle, fset=setUAngle,
-                   doc='Rotation angle corresponding to matrix U in radians')
+    uAngle = property(
+        fget=getUAngle,
+        fset=setUAngle,
+        doc="Rotation angle corresponding to matrix U in radians",
+    )
 
     def getUAngleDeg(self):
         """
         Returns angle alpha corresponding to rotation matrix self.u
         """
-        res =  self.getAngle(q=self.u) * 180 / numpy.pi
+        res = self.getAngle(q=self.u) * 180 / numpy.pi
         return res
 
     def setUAngleDeg(self, angle):
@@ -299,8 +324,11 @@ class Affine2D(Affine):
         self.u = self.makeQ(angle_rad)
         self.gl = self.composeGl()
 
-    uAngleDeg = property(fget=getUAngleDeg, fset=setUAngleDeg,
-                   doc='Rotation angle corresponding to matrix U in degrees')
+    uAngleDeg = property(
+        fget=getUAngleDeg,
+        fset=setUAngleDeg,
+        doc="Rotation angle corresponding to matrix U in degrees",
+    )
 
     def getVAngle(self):
         """
@@ -315,14 +343,17 @@ class Affine2D(Affine):
         self.v = self.makeQ(angle)
         self.gl = self.composeGl()
 
-    vAngle = property(fget=getVAngle, fset=setVAngle,
-                   doc='Rotation angle corresponding to matrix V in radians')
+    vAngle = property(
+        fget=getVAngle,
+        fset=setVAngle,
+        doc="Rotation angle corresponding to matrix V in radians",
+    )
 
     def getVAngleDeg(self):
         """
         Returns angle alpha corresponding to rotation matrix self.v
         """
-        res =  self.getAngle(q=self.v) * 180 / numpy.pi
+        res = self.getAngle(q=self.v) * 180 / numpy.pi
         return res
 
     def setVAngleDeg(self, angle):
@@ -333,8 +364,11 @@ class Affine2D(Affine):
         self.v = self.makeQ(angle_rad)
         self.gl = self.composeGl()
 
-    vAngleDeg = property(fget=getVAngleDeg, fset=setVAngleDeg,
-                   doc='Rotation angle corresponding to matrix V in degrees')
+    vAngleDeg = property(
+        fget=getVAngleDeg,
+        fset=setVAngleDeg,
+        doc="Rotation angle corresponding to matrix V in degrees",
+    )
 
     def getScaleAngle(self):
         """
@@ -350,13 +384,13 @@ class Affine2D(Affine):
         """
         ratio = self.scale[1] / self.scale[0]
         if ratio > 1:
-            ratio = 1. / ratio
+            ratio = 1.0 / ratio
         res = numpy.arccos(ratio)
         return res
 
     scaleAngle = property(
-        fget=getScaleAngle,
-        doc='Angle corresponding to the ratio of scales (in rad)')
+        fget=getScaleAngle, doc="Angle corresponding to the ratio of scales (in rad)"
+    )
 
     def getScaleAngleDeg(self):
         """
@@ -371,7 +405,8 @@ class Affine2D(Affine):
 
     scaleAngleDeg = property(
         fget=getScaleAngleDeg,
-        doc='Angle corresponding to the ratio of scales in degrees')
+        doc="Angle corresponding to the ratio of scales in degrees",
+    )
 
     def getShear(self):
         """
@@ -384,7 +419,7 @@ class Affine2D(Affine):
         res = self.m[0, 1]
         return res
 
-    shear = property(fget=getShear, doc='Shear')
+    shear = property(fget=getShear, doc="Shear")
 
     ##############################################################
     #
@@ -392,8 +427,7 @@ class Affine2D(Affine):
     #
 
     @classmethod
-    def find(
-            cls, x, y, x_ref='cm', y_ref='cm', type_='gl', xy_axes='point_dim'):
+    def find(cls, x, y, x_ref="cm", y_ref="cm", type_="gl", xy_axes="point_dim"):
         """
         Finds affine transformation (general linear transformation folowed by a
         translation) that minimizes square error for transforming points x to
@@ -451,27 +485,31 @@ class Affine2D(Affine):
           and one scale (currently implemented for 2D transformations only)
         """
 
-        if type_ == 'gl':
+        if type_ == "gl":
 
             # run Affine.base and downcast
             base_inst = cls.__base__.find(
-                x=x, y=y, x_ref=x_ref, y_ref=y_ref, xy_axes=xy_axes)
+                x=x, y=y, x_ref=x_ref, y_ref=y_ref, xy_axes=xy_axes
+            )
             inst = cls.downcast(affine=base_inst)
 
-        elif type_ == 'rs':
+        elif type_ == "rs":
 
             # call special method for 'rs' type in 2D
-            inst = cls.findRS(
-                x=x, y=y, x_ref=x_ref, y_ref=y_ref, xy_axes=xy_axes)
+            inst = cls.findRS(x=x, y=y, x_ref=x_ref, y_ref=y_ref, xy_axes=xy_axes)
 
         else:
-            raise ValueError("Argument type_: ", type_, "was not ",
-                             "understood. Valid values are 'gl', and 'rs'.")
+            raise ValueError(
+                "Argument type_: ",
+                type_,
+                "was not ",
+                "understood. Valid values are 'gl', and 'rs'.",
+            )
 
         return inst
 
     @classmethod
-    def findRS(cls, x, y, x_ref='cm', y_ref='cm', xy_axes='point_dim'):
+    def findRS(cls, x, y, x_ref="cm", y_ref="cm", xy_axes="point_dim"):
         """
         Finds transformation consisting of rotation, single scale factor and
         translation in 2D that minimizes square error for transforming points
@@ -532,36 +570,43 @@ class Affine2D(Affine):
         """
 
         # bring x and y to n_points x n_dim shape
-        if xy_axes == 'point_dim':
+        if xy_axes == "point_dim":
             pass
-        elif xy_axes == 'dim_point':
+        elif xy_axes == "dim_point":
             x = x.transpose()
             y = y.transpose()
         else:
             raise ValueError(
                 "Argument xy_axes was not understood. Possible values are: "
-                + "'point_dim' and 'dim_point'.")
+                + "'point_dim' and 'dim_point'."
+            )
 
         # bring x to reference frame
-        if isinstance(x_ref, str) and (x_ref == 'cm'):
+        if isinstance(x_ref, str) and (x_ref == "cm"):
             x_ref = numpy.mean(x, axis=0)
         elif isinstance(x_ref, (list, tuple, numpy.ndarray)):
             pass
         else:
-            raise ValueError(\
-                'Argument x_ref: ', x_ref, ' was not understood.',
-                " Allowed values are None, 'cm', or an array.")
+            raise ValueError(
+                "Argument x_ref: ",
+                x_ref,
+                " was not understood.",
+                " Allowed values are None, 'cm', or an array.",
+            )
         x_prime = x - x_ref
 
         # bring y to reference frame
-        if isinstance(y_ref, str) and (y_ref == 'cm'):
+        if isinstance(y_ref, str) and (y_ref == "cm"):
             y_ref = numpy.mean(y, axis=0)
         elif isinstance(y_ref, (list, tuple, numpy.ndarray)):
             pass
         else:
-            raise ValueError(\
-                'Argument y_ref: ', y_ref, ' was not understood.',
-                " Allowed values are None, 'cm', or an array.")
+            raise ValueError(
+                "Argument y_ref: ",
+                y_ref,
+                " was not understood.",
+                " Allowed values are None, 'cm', or an array.",
+            )
         y_prime = y - y_ref
 
         # find parity and scale
@@ -580,8 +625,9 @@ class Affine2D(Affine):
         phi = numpy.arctan2(-ypx, float(ys2px)) + numpy.pi / 2
 
         # q (rotation matrix)
-        q = numpy.array([[numpy.cos(phi), -numpy.sin(phi)],
-                        [numpy.sin(phi), numpy.cos(phi)]])
+        q = numpy.array(
+            [[numpy.cos(phi), -numpy.sin(phi)], [numpy.sin(phi), numpy.cos(phi)]]
+        )
 
         # check +pi ambiguity of phi
         yqpx = (numpy.dot(y_prime, q) * numpy.inner(x_prime, p)).sum()
@@ -596,8 +642,8 @@ class Affine2D(Affine):
         inst.xy_axes = xy_axes
 
         # get error
-        inst.error = y - inst.transform(x, xy_axes='point_dim')
-        if xy_axes == 'dim_point':
+        inst.error = y - inst.transform(x, xy_axes="point_dim")
+        if xy_axes == "dim_point":
             inst.error = inst.error.transpose()
 
         # save transformations
@@ -605,7 +651,7 @@ class Affine2D(Affine):
         inst.s = s
         inst.p = p
         inst.m = numpy.identity(2)
-        #inst.gl = gl
+        # inst.gl = gl
 
         return inst
 
@@ -649,7 +695,7 @@ class Affine2D(Affine):
         raise NotImplementedError("Sorry, this is still work in progress.")
 
         # remove masked points
-        [x, y], mask = cls.removeMasked([x,y], [x_mask,y_mask])
+        [x, y], mask = cls.removeMasked([x, y], [x_mask, y_mask])
 
         # deal with mode
         if d is None:
@@ -722,7 +768,7 @@ class Affine2D(Affine):
         # decompose
         decomp = super(self.__class__, self).decompose(gl=gl, order=order)
 
-        if order == 'usv':
+        if order == "usv":
 
             # adjust u and v
             if decomp is None:
@@ -733,7 +779,7 @@ class Affine2D(Affine):
             else:
 
                 # make another instance and modify attributes there
-                local = self.__class__(order='usv')
+                local = self.__class__(order="usv")
                 (local.u, local.p, local.s, local.v) = decomp
                 local.adjustUV()
 
@@ -761,5 +807,4 @@ class Affine2D(Affine):
             self.vAngle += numpy.pi
 
             # compose (should not decompose)
-            self.gl = self.composeGl(order='usv')
-
+            self.gl = self.composeGl(order="usv")

@@ -4,18 +4,18 @@
 Quadratic Interpolation of Spectral Peaks
 
 # @Title            : parabolic
-# @Project            : 3DCTv2
-# @Description        : Quadratic Interpolation of Spectral Peaks
-# @Author            : endolith
+# @Project          : 3DCTv2
+# @Description      : Quadratic Interpolation of Spectral Peaks
+# @Author           : endolith
 # @Email            : endolith (at) gmail.com
-# @Credits            : https://gist.github.com/endolith/255291
-# @Maintainer        :
-# @Date                : 2015/12
-# @Version            : 3DCT 2.3.0 module rev. 1
-# @Status            : stable
+# @Credits          : https://gist.github.com/endolith/255291
+# @Maintainer       :
+# @Date             : 2015/12
+# @Version          : 3DCT 2.3.0 module rev. 1
+# @Status           : stable
 # @Usage            :
 # @Notes            :
-# @Python_version    : 2.7.11
+# @Python_version   : 2.7.11
 """
 # ======================================================================================================================
 
@@ -41,8 +41,8 @@ def parabolic(f, x):
     (3.2142857142857144, 6.1607142857142856)
 
     """
-    xv = 1/2. * (f[x-1] - f[x+1]) / (f[x-1] - 2 * f[x] + f[x+1]) + x
-    yv = f[x] - 1/4. * (f[x-1] - f[x+1]) * (xv - x)
+    xv = 1 / 2.0 * (f[x - 1] - f[x + 1]) / (f[x - 1] - 2 * f[x] + f[x + 1]) + x
+    yv = f[x] - 1 / 4.0 * (f[x - 1] - f[x + 1]) * (xv - x)
     return (xv, yv)
 
 
@@ -54,9 +54,11 @@ def parabolic_polyfit(f, x, n):
     n is the number of samples of the curve used to fit the parabola.
 
     """
-    a, b, c = polyfit(arange(x-n//2, x+n//2+1), f[x-n//2:x+n//2+1], 2)
-    xv = -0.5 * b/a
-    yv = a * xv**2 + b * xv + c
+    a, b, c = polyfit(
+        arange(x - n // 2, x + n // 2 + 1), f[x - n // 2: x + n // 2 + 1], 2
+    )
+    xv = -0.5 * b / a
+    yv = a * xv ** 2 + b * xv + c
     return (xv, yv)
 
 
@@ -74,7 +76,7 @@ if __name__ == "__main__":
 
     plot = plt.plot(y)
     plt.hold(True)
-    plt.plot(xm, ym, 'o', color='silver')
-    plt.plot(xp, yp, 'o', color='blue')
-    plt.title('silver = max, blue = estimated max')
+    plt.plot(xm, ym, "o", color="silver")
+    plt.plot(xp, yp, "o", color="blue")
+    plt.title("silver = max, blue = estimated max")
     plt.show()

@@ -30,6 +30,7 @@ import pyto.attributes as attributes
 # Module import
 #
 
+
 def __import__(name, path):
     """
     Imports a module that is outside of python path.
@@ -66,6 +67,7 @@ def __import__(name, path):
 # File name related
 #
 
+
 def get_file_base(file_):
     """
     Returns base and root of the image file name
@@ -75,7 +77,7 @@ def get_file_base(file_):
     return base, root
 
 
-def format_param(value=None, name='', format=None):
+def format_param(value=None, name="", format=None):
     """
     Makes parameter strings to be used for file names.
 
@@ -89,15 +91,22 @@ def format_param(value=None, name='', format=None):
         value_str = (format % value).strip()
         value_long_str = name + value_str
     else:
-        value_str = ''
-        value_long_str = ''
+        value_str = ""
+        value_long_str = ""
 
     return value_str, value_long_str
 
 
-def make_file_name(directory='', prefix='', insert_root=True,
-                   reference=None, param_name='', param_value=None,
-                   param_format=None, suffix=''):
+def make_file_name(
+    directory="",
+    prefix="",
+    insert_root=True,
+    reference=None,
+    param_name="",
+    param_value=None,
+    param_format=None,
+    suffix="",
+):
     """
     Returns a labels file name of the form:
 
@@ -121,8 +130,9 @@ def make_file_name(directory='', prefix='', insert_root=True,
     """
 
     # format parameter
-    value_str, value_long_str = format_param(value=param_value, name=param_name,
-                                             format=param_format)
+    value_str, value_long_str = format_param(
+        value=param_value, name=param_name, format=param_format
+    )
 
     # extract root from the reference file
     ref_base, root = get_file_base(reference)
@@ -134,6 +144,7 @@ def make_file_name(directory='', prefix='', insert_root=True,
     file_name = os.path.join(directory, base)
 
     return file_name
+
 
 ##################################################
 #
@@ -153,9 +164,19 @@ def read_image(file_name):
 
 
 def read_labels(
-        file_name, ids, label_ids=None, shape=None, suggest_shape=None,
-        byte_order=None, data_type=None, array_order=None, shift=None,
-        clean=False, offset=None, check=True):
+    file_name,
+    ids,
+    label_ids=None,
+    shape=None,
+    suggest_shape=None,
+    byte_order=None,
+    data_type=None,
+    array_order=None,
+    shift=None,
+    clean=False,
+    offset=None,
+    check=True,
+):
     """
     Reads file(s) containing labels.
 
@@ -201,15 +222,28 @@ def read_labels(
     # read
     if is_multi_file(file_name=file_name):
         bound, multi_boundary_ids = read_multi_labels(
-            file_name=file_name, ids=ids, label_ids=label_ids, shift=shift,
-            shape=shape, suggest_shape=suggest_shape,
-            byte_order=byte_order, data_type=data_type, array_order=array_order,
-            clean=clean)
+            file_name=file_name,
+            ids=ids,
+            label_ids=label_ids,
+            shift=shift,
+            shape=shape,
+            suggest_shape=suggest_shape,
+            byte_order=byte_order,
+            data_type=data_type,
+            array_order=array_order,
+            clean=clean,
+        )
     else:
         bound = read_single_labels(
-            file_name=file_name, ids=ids, shape=shape,
-            suggest_shape=suggest_shape, byte_order=byte_order,
-            data_type=data_type, array_order=array_order, clean=clean)
+            file_name=file_name,
+            ids=ids,
+            shape=shape,
+            suggest_shape=suggest_shape,
+            byte_order=byte_order,
+            data_type=data_type,
+            array_order=array_order,
+            clean=clean,
+        )
         multi_boundary_ids = [label_ids]
 
     # offset
@@ -218,10 +252,10 @@ def read_labels(
     # check
     if check:
         nonun = bound.findNonUnique()
-        if len(nonun['many']) > 0:
+        if len(nonun["many"]) > 0:
             logging.warning(
                 "The following discs are disconnected: " + str(nonun.many))
-        if len(nonun['empty']) > 0:
+        if len(nonun["empty"]) > 0:
             logging.warning(
                 "The following discs do not exist: " + str(nonun.empty))
 
@@ -241,13 +275,23 @@ def is_multi_file(file_name):
         return True
     else:
         raise ValueError(
-            "File name " + str(file_name) + " has to be either a string / "
-            + "unicode (one file) or a tuple (multiple files).")
+            "File name "
+            + str(file_name)
+            + " has to be either a string / "
+            + "unicode (one file) or a tuple (multiple files)."
+        )
 
 
 def read_single_labels(
-        file_name, ids, shape=None, byte_order=None, data_type=None,
-        array_order=None, suggest_shape=None, clean=False):
+    file_name,
+    ids,
+    shape=None,
+    byte_order=None,
+    data_type=None,
+    array_order=None,
+    suggest_shape=None,
+    clean=False,
+):
     """
     Reads and initializes labels from a sigle labels file.
 
@@ -278,16 +322,30 @@ def read_single_labels(
 
     # read labels file and make a Segment object
     bound = pyto.segmentation.Segment.read(
-        file=file_name, ids=ids, clean=clean,
-        byteOrder=byte_order, dataType=data_type,
-        arrayOrder=array_order, shape=shape)
+        file=file_name,
+        ids=ids,
+        clean=clean,
+        byteOrder=byte_order,
+        dataType=data_type,
+        arrayOrder=array_order,
+        shape=shape,
+    )
 
     return bound
 
 
 def read_multi_labels(
-        file_name, ids, label_ids, shift=None, shape=None, suggest_shape=None,
-        byte_order=None, data_type=None, array_order=None, clean=False):
+    file_name,
+    ids,
+    label_ids,
+    shift=None,
+    shape=None,
+    suggest_shape=None,
+    byte_order=None,
+    data_type=None,
+    array_order=None,
+    clean=False,
+):
     """
     Reads and initializes labels form multiple labels file. The label ids
     are shifted so that they do not overlap and the labels are merged.
@@ -326,16 +384,22 @@ def read_multi_labels(
     for (l_name, a_ids, v_ids) in zip(file_name, ids, label_ids):
 
         # find shape
-        found_shape = find_shape(file_name=l_name, shape=shape,
-                                 suggest_shape=suggest_shape)
+        found_shape = find_shape(
+            file_name=l_name, shape=shape, suggest_shape=suggest_shape
+        )
 
         # read
         curr_bound = pyto.segmentation.Segment.read(
-            file=l_name, ids=a_ids,
-            clean=clean, byteOrder=byte_order, dataType=data_type,
-            arrayOrder=array_order, shape=found_shape)
+            file=l_name,
+            ids=a_ids,
+            clean=clean,
+            byteOrder=byte_order,
+            dataType=data_type,
+            arrayOrder=array_order,
+            shape=found_shape,
+        )
 
-        bound.add(new=curr_bound, shift=curr_shift, dtype='int16')
+        bound.add(new=curr_bound, shift=curr_shift, dtype="int16")
         shifted_vesicle_ids.append(numpy.array(v_ids) + curr_shift)
         if shift is None:
             curr_shift = None
@@ -370,7 +434,7 @@ def find_shape(file_name, shape=None, suggest_shape=None):
 
         bound_io = pyto.io.ImageIO(file=file_name)
         bound_io.setFileFormat()
-        if (bound_io.fileFormat == 'em') or (bound_io.fileFormat == 'mrc'):
+        if (bound_io.fileFormat == "em") or (bound_io.fileFormat == "mrc"):
 
             # specified in header
             result_shape = None
@@ -394,6 +458,7 @@ def find_shape(file_name, shape=None, suggest_shape=None):
 # Writting result files
 #
 
+
 def make_top_header():
     """
     Returns header lines containing machine and files info
@@ -406,13 +471,19 @@ def make_top_header():
     script_file_name = sys.modules[__name__].__file__
 
     # general
-    header = ["#",
-              "# Machine: " + mach_name + " " + mach_arch,
-              "# Date: " + time.asctime(time.localtime()),
-              "#"]
-    header.extend(format_file_info(
-        name=script_file_name, description="Input script",
-        extra=("  "+__version__)))
+    header = [
+        "#",
+        "# Machine: " + mach_name + " " + mach_arch,
+        "# Date: " + time.asctime(time.localtime()),
+        "#",
+    ]
+    header.extend(
+        format_file_info(
+            name=script_file_name,
+            description="Input script",
+            extra=("  " + __version__),
+        )
+    )
     header.append("# Working directory: " + os.getcwd())
     header.append("#")
 
@@ -430,7 +501,7 @@ def machine_info():
     return mach_name, mach_arch
 
 
-def format_file_info(name, description, ids=None, extra=''):
+def format_file_info(name, description, ids=None, extra=""):
     """
     Returns a list of string(s) containing file, description and file creation
     time. Works also if more than one name is given. If arg ids is specified
@@ -452,10 +523,10 @@ def format_file_info(name, description, ids=None, extra=''):
         lines = ["# " + description + ":"]
         for one_name in name:
             try:
-                file_time = time.asctime(time.localtime(
-                    os.path.getmtime(one_name)))
+                file_time = time.asctime(
+                    time.localtime(os.path.getmtime(one_name)))
             except OSError:
-                file_time = 'not written'
+                file_time = "not written"
             lines.extend(["#     " + one_name + " (" + file_time + ")"])
             if ids is not None:
                 lines.extend(["#     Ids:" + str(ids)])
@@ -466,11 +537,12 @@ def format_file_info(name, description, ids=None, extra=''):
         try:
             file_time = time.asctime(time.localtime(os.path.getmtime(name)))
         except OSError:
-            file_time = 'not written'
-        lines = [("# " + description + ": " + name + " (" + file_time + ")"
-                  + extra)]
+            file_time = "not written"
+        lines = [("# " + description + ": " + name +
+                  " (" + file_time + ")" + extra)]
 
     return lines
+
 
 ##################################################
 #
@@ -478,8 +550,16 @@ def format_file_info(name, description, ids=None, extra=''):
 #
 
 
-def write_labels(labels, name, data_type, inset=False, ids=None,
-                 length=None, pixel=1, casting='unsafe'):
+def write_labels(
+    labels,
+    name,
+    data_type,
+    inset=False,
+    ids=None,
+    length=None,
+    pixel=1,
+    casting="unsafe",
+):
     """
     Writes labels as an array.
 
@@ -505,7 +585,7 @@ def write_labels(labels, name, data_type, inset=False, ids=None,
     # expand if needed
     init_inset = labels.inset
     if inset is not None:
-        labels.useInset(inset=inset, mode='abs', expand=True)
+        labels.useInset(inset=inset, mode="abs", expand=True)
 
     # remove ids if needed
     if ids is not None:
@@ -517,12 +597,14 @@ def write_labels(labels, name, data_type, inset=False, ids=None,
     # see about adjusting the data type if needed
 
     # write
-    labels_clean.write(file=name, dataType=data_type, length=length,
-                       pixel=pixel, casting=casting)
+    labels_clean.write(
+        file=name, dataType=data_type, length=length, pixel=pixel, casting=casting
+    )
 
     # revert to the original inset
     if inset is not None:
-        labels.useInset(inset=init_inset, mode='abs')
+        labels.useInset(inset=init_inset, mode="abs")
+
 
 ##################################################
 #
@@ -559,7 +641,7 @@ def read_pickle(file_name, compact=[], inset=None, image=[]):
     if inset is not None:
         for image_name in image:
             image_obj = attributes.getattr_deep(obj, image_name)
-            image_obj.useInset(inset=inset, mode='abs',
+            image_obj.useInset(inset=inset, mode="abs",
                                useFull=True, expand=True)
 
     return obj
@@ -594,7 +676,7 @@ def write_pickle(obj, file_name, image=[], compact=[]):
         image_obj.makeInset()
 
     # write
-    out_file = open(file_name, 'wb')
+    out_file = open(file_name, "wb")
     pickle.dump(obj, out_file, -1)
 
     # expand
@@ -605,4 +687,4 @@ def write_pickle(obj, file_name, image=[], compact=[]):
     # recover image insets
     for image_name, inset in zip(image, full_insets):
         image_obj = attributes.getattr_deep(obj, image_name)
-        image_obj.useInset(inset=inset, mode='abs', useFull=True, expand=True)
+        image_obj.useInset(inset=inset, mode="abs", useFull=True, expand=True)
