@@ -62,7 +62,7 @@ def getzPoly(x, y, img, n=None, optimize=False):
     elif isinstance(img, str):
         img = tf.imread(img)
 
-    data_z = img[:, y, x]
+    data_z = img[:, int(round(y)), int(round(x))]
 
     if n is None:
         n = getn(data_z)
@@ -116,8 +116,7 @@ def getzGauss(
         )
     elif isinstance(img, str):
         img = tf.imread(img)
-
-    data_z = img[:, y, x]
+    data_z = img[:, int(round(y)), int(round(x))]
     data = np.array([np.arange(len(data_z)), data_z])
     poptZ, pcov = gaussfit(data, parent)
 
@@ -133,8 +132,9 @@ def getzGauss(
             )
         for repeat in range(repeats):
             data = np.copy(
-                img[round(poptZ[1]), y - cutout: y +
-                    cutout, x - cutout: x + cutout]
+                img[int(round(poptZ[1])),
+                    int(round(y - cutout)): int(round(y + cutout)),
+                    int(round(x - cutout)): int(round(x + cutout))]
             )
             if threshold is not None:
                 threshold = data < data.max() - (data.max() - data.min()) * threshVal
@@ -146,7 +146,7 @@ def getzGauss(
             # x and y are switched when applying the offset
             x = x - cutout + yopt
             y = y - cutout + xopt
-            data_z = img[:, y, x]
+            data_z = img[:, int(round(y)), int(round(x))]
             data = np.array([np.arange(len(data_z)), data_z])
             poptZ, pcov = gaussfit(data, parent, hold=True)
             if parent:
@@ -162,7 +162,7 @@ def optimize_z(x, y, z, image, n=None):
     elif type(image) == np.ndarray:
         img = image
 
-    data_z = img[:, y, x]
+    data_z = img[:, int(round(y)), int(round(x))]
 
     if n is None:
         n = getn(data_z)
