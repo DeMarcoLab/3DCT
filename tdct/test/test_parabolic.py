@@ -17,7 +17,7 @@
 # @Status           : stable
 # @Usage            : pytest
 # @Notes            :
-# @Python_version   : 3.6
+# @Python_version   : 2.7.12
 """
 # ======================================================================================================================
 from tdct import parabolic

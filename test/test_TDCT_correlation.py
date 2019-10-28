@@ -116,7 +116,7 @@ def test_anglectrl(tdct_CorrelationInstance_setup):
     testArray = {-1: 359, 0: 0, 1: 1, 359: 359, 360: 0, 361: 1}
     for k, v in testArray.items():
         print("Testing angle {0:03}, expecting {1:03} ... ".format(
-            k, v), end=" ")
+            k, v, end=" "))
         angle = tdct_CorrelationInstance_setup.window.anglectrl(angle=k)
         assert angle == v
         print("OK")

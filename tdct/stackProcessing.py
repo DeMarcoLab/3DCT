@@ -600,7 +600,7 @@ def norm_img(img, copy=False, qtprocessbar=None):
     if img.ndim == 2:
         if debug is True:
             print(clrmsg.DEBUG, "2D image")
-        img *= typesize / img.max()
+        img *= typesize // img.max()
     ## 3D or multichannel image
     elif img.ndim == 3:
         ## tiffimage reads z,y,x for stacks but y,x,c if it is multichannel image (or z,c,y,x if it is a multicolor image stack)
