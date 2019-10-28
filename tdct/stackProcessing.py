@@ -386,7 +386,7 @@ def pxSize(img_path, z=False):
     """Extract pixel size from meta/exif data. Tailored for image headers from FEI dual beam electron microscopes
     and CorrSight light microscope"""
     with tf.TiffFile(img_path) as tif:
-        for page in tif:
+        for page in tif.pages:
             for tag in list(page.tags.values()):
                 if isinstance(tag.value, str):
                     for keyword in (
